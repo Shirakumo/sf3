@@ -75,9 +75,9 @@ Payload  ::= Layer{Depth}
 Layer    ::= Row{Height}
 Row      ::= Color{Width}
 Color    ::= channel{channel-count}
-Width    ::= int32
-Height   ::= int32
-Depth    ::= int32
+Width    ::= uint32
+Height   ::= uint32
+Depth    ::= uint32
 format   --- A single octet identifying the per-channel data type.
 channels --- A single octet identifying the number and order of channels.
 channel  --- A single-channel colour value in the format indicated by format.
