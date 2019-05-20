@@ -21,13 +21,13 @@ SF3 formats follow these principles:
 The format specifications in this document use a BNF-style abstract syntax language. The language is defined here:
 
 :: BNF
-Format      ::= (Definition | Description)*
-Definition  ::= Rule '::=' Sequence '\n'
-Description ::= Rule '---' text
+Format      ::= Definition+
+Definition  ::= Rule '::=' Sequence Description? '\n'
+Description ::= '---' text
 Sequence    ::= Composition (' ' Composition)*
 Composition ::= (Rule | OctetArray | Octet | Type | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
 OctetArray  ::= '[' (octet | ascii) (' ' (octet | ascii))* ']'
-Type        ::= 'int8' | 'int16' | 'int32' | 'int64' | 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'float16' | 'float32' | 'float64'
+Type        ::= 'int8' | 'int16' | 'int32' | 'int64' | 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'float16' | 'float32' | 'float64' | ('string' ExactNumber)
 Rule        ::= name
 OneOrMore   ::= '+'
 AnyNumber   ::= '*'
@@ -40,7 +40,7 @@ text        --- Human-readable textual description of the contents.
 number      --- A textual description of the number of occurrences. Can make a reference to other rules, in which case the rule's content designates a runtime number.
 ::
 
-White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed.
+White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a UTF-8 encoded character sequence with an octet length as indicated by the required following ``ExactNumber`` rule.
 
 # Formats
 Each format is made up of the following structure, where a valid file must begin with the ``File`` rule.
@@ -61,65 +61,141 @@ The rationale for the ten octets in the identifier is as follows:
 
 The ``Header`` and ``Payload`` will be described by the individual formats. The following format mapping is used:
 
-- ``00`` Text
-- ``01`` Image
-- ``02`` Audio
-- ``03`` Model
-- ``04`` Archive
+- ``00`` --- Text
+- ``01`` --- Image
+- ``02`` --- Audio
+- ``03`` --- Model
+- ``04`` --- Archive
 
 Any other value for the ``format-id`` is invalid.
 
 ## Archive
+Todo
 
 ## Audio
-
-## Image
+This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.
 
 :: BNF
-Header   ::= Width Height Depth channels format
-Payload  ::= Layer{Depth}
-Layer    ::= Row{Height}
-Row      ::= Color{Width}
-Color    ::= channel{channel-count}
-Width    ::= uint32
-Height   ::= uint32
-Depth    ::= uint32
-format   --- A single octet identifying the per-channel data type.
-channels --- A single octet identifying the number and order of channels.
-channel  --- A single-channel colour value in the format indicated by format.
+Header     ::= Samplerate Channels format 
+Payload    ::= sample{Channels}*
+Samplerate ::= uint32 --- The samplerate in Hz.
+Channels   ::= uint8  --- The number of audio channels.
+format     --- A single octet identifying the per-sample data type.
+sample     --- A single-channel sample value in the format indicated by format.
+::
+
+The format is identified as one of the following:
+
+- ``01`` --- ``int8``
+- ``02`` --- ``int16``
+- ``03`` --- ``int24``
+- ``04`` --- ``int32``
+- ``08`` --- ``int64``
+- ``11`` --- ``uint8``
+- ``12`` --- ``uint16``
+- ``13`` --- ``uint24``
+- ``14`` --- ``uint32``
+- ``18`` --- ``uint64``
+- ``24`` --- ``float32``
+- ``28`` --- ``float64``
+
+The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits.
+
+## Image
+This format is for storing raw image data. Unlike plain data however, it includes a header that completely identifies the pixel data layout and format. The format supports 3D images as well.
+
+:: BNF
+Header        ::= Width Height Depth channels format
+Payload       ::= Layer{Depth}
+Layer         ::= Row{Height}
+Row           ::= Color{Width}
+Color         ::= channel{channel-count}
+Width         ::= uint32
+Height        ::= uint32
+Depth         ::= uint32
+format        --- A single octet identifying the per-channel data type.
+channels      --- A single octet identifying the number and order of channels.
+channel       --- A single-channel colour value in the format indicated by format.
 channel-count --- The number of channels indicated by channels.
 ::
 
 The format is identified as one of the following:
 
-- ``01`` int8
-- ``02`` int16
-- ``04`` int32
-- ``08`` int64
-- ``11`` uint8
-- ``12`` uint16
-- ``14`` uint32
-- ``18`` uint64
-- ``22`` float16
-- ``24`` float32
-- ``28`` float64
+- ``01`` --- ``int8``
+- ``02`` --- ``int16``
+- ``04`` --- ``int32``
+- ``08`` --- ``int64``
+- ``11`` --- ``uint8``
+- ``12`` --- ``uint16``
+- ``14`` --- ``uint32``
+- ``18`` --- ``uint64``
+- ``22`` --- ``float16``
+- ``24`` --- ``float32``
+- ``28`` --- ``float64``
 
 The channels are identified as one of the following:
 
-- ``01`` R
-- ``02`` RG
-- ``03`` RGB
-- ``04`` RGBA
-- ``12`` GR
-- ``13`` BGR
-- ``14`` ABGR
-- ``24`` ARGB
-- ``34`` BGRA
+- ``01`` --- ``R``
+- ``02`` --- ``RG``
+- ``03`` --- ``RGB``
+- ``04`` --- ``RGBA``
+- ``12`` --- ``GR``
+- ``13`` --- ``BGR``
+- ``14`` --- ``ABGR``
+- ``24`` --- ``ARGB``
+- ``34`` --- ``BGRA``
 
 The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` number of bits.
 
 ## Model
+This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular meshes.
 
+:: BNF
+Header         ::= format material-type Count
+Payload        ::= Material Faces Vertices
+Count          ::= uint32
+Material       ::= Texture{material-count}
+Texture        ::= uint16 string{uint16}
+Faces          ::= uint32{Count}
+Vertices       ::= vertex{Count}
+Position       ::= float32 float32 float32 --- A vertex position in model-space.
+UV             ::= float32 float32         --- A texture coordinate in texture-space.
+Color          ::= float32 float32 float32 --- An RGB colour triplet, each channel in [0,1].
+Normal         ::= float32 float32 float32 --- A surface normal, in tangent-space.
+Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-space.
+format         --- A single octet identifying the per-vertex format.
+material-type  --- A single octet identifying the material used.
+material-count --- The number of material textures as indicated by material-type.
+vertex         --- A single-vertex value in the format indicated by format.
+::
+
+The following formats are recognised, and describe the layout of the ``vertex``:
+
+- ``10`` --- ``Position``
+- ``20`` --- ``Position`` ``UV``
+- ``21`` --- ``Position`` ``Color``
+- ``22`` --- ``Position`` ``Normal``
+- ``30`` --- ``Position`` ``UV`` ``Normal``
+- ``31`` --- ``Position`` ``Color`` ``Normal``
+- ``40`` --- ``Position`` ``UV`` ``Normal`` ``Tangent``
+
+The following material-types are recognised, and describe the usage and number of ``Texture``s.
+
+- ``00`` ---
+- ``10`` --- Albedo
+- ``20`` --- Albedo Normal
+- ``21`` --- Albedo Emission
+- ``30`` --- Albedo Normal Specular
+- ``31`` --- Albedo Normal Emission
+- ``32`` --- Albedo Normal Metallic
+- ``40`` --- Albedo Normal Metalness Roughness
+- ``41`` --- Albedo Normal Specular Emission
+- ``42`` --- Albedo Normal Metallic Emission
+- ``50`` --- Albedo Normal Metalness Roughness Emission
+- ``51`` --- Albedo Normal Metalness Roughness Occlusion
+- ``60`` --- Albedo Normal Metalness Roughness Occlusion Emission
+
+Where the Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively. Each ``Texture`` is a length-prefixed string of a file path to an image file relative to the model file's own path.
 
 ## Text
 The text format identifies the character encoding used, followed by the raw text payload. Essentially this means it is a regular "text file", but with a header that identifies the actual encoding used and thus liberates the need for encoding detecting kludges.
@@ -133,41 +209,41 @@ text     --- A sequence of octets in the encoding described by the header.
 
 The following encodings are recognised:
 
-- ``00`` US-ASCII
-- ``10`` UTF-8
-- ``11`` UTF-16
-- ``12`` UTF-32
-- ``20`` ISO 8859-1
-- ``21`` ISO 8859-2
-- ``22`` ISO 8859-3
-- ``23`` ISO 8859-4
-- ``24`` ISO 8859-5
-- ``25`` ISO 8859-6
-- ``26`` ISO 8859-7
-- ``27`` ISO 8859-8
-- ``28`` ISO 8859-9
-- ``29`` ISO 8859-10
-- ``2A`` ISO 8859-11
-- ``2B`` ISO 8859-12
-- ``2C`` ISO 8859-13
-- ``2D`` ISO 8859-14
-- ``2E`` ISO 8859-15
-- ``2F`` ISO 8859-16
-- ``30`` Windows-874
-- ``31`` Windows-1250
-- ``32`` Windows-1251
-- ``33`` Windows-1252
-- ``34`` Windows-1253
-- ``35`` Windows-1254
-- ``36`` Windows-1255
-- ``37`` Windows-1256
-- ``40`` EUC-CN
-- ``41`` EUC-JP
-- ``42`` EUC-KR
-- ``43`` EUC-TW
-- ``F0`` Shift JIS
-- ``F1`` Big5
-- ``F2`` GBK
+- ``00`` --- US-ASCII
+- ``10`` --- UTF-8
+- ``11`` --- UTF-16
+- ``12`` --- UTF-32
+- ``20`` --- ISO 8859-1
+- ``21`` --- ISO 8859-2
+- ``22`` --- ISO 8859-3
+- ``23`` --- ISO 8859-4
+- ``24`` --- ISO 8859-5
+- ``25`` --- ISO 8859-6
+- ``26`` --- ISO 8859-7
+- ``27`` --- ISO 8859-8
+- ``28`` --- ISO 8859-9
+- ``29`` --- ISO 8859-10
+- ``2A`` --- ISO 8859-11
+- ``2B`` --- ISO 8859-12
+- ``2C`` --- ISO 8859-13
+- ``2D`` --- ISO 8859-14
+- ``2E`` --- ISO 8859-15
+- ``2F`` --- ISO 8859-16
+- ``30`` --- Windows-874
+- ``31`` --- Windows-1250
+- ``32`` --- Windows-1251
+- ``33`` --- Windows-1252
+- ``34`` --- Windows-1253
+- ``35`` --- Windows-1254
+- ``36`` --- Windows-1255
+- ``37`` --- Windows-1256
+- ``40`` --- EUC-CN
+- ``41`` --- EUC-JP
+- ``42`` --- EUC-KR
+- ``43`` --- EUC-TW
+- ``50`` --- Shift JIS
+- ``51`` --- Big5
+- ``52`` --- GBK
 
 Any other value for the ``encoding`` is invalid.
 

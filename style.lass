@@ -3,6 +3,9 @@
  :font-size 13pt
  :max-width 800px
  :margin 0 auto
+ (h1 :font-size 1.6em)
+ (h2 :font-size 1.3em)
+ (h3 :font-size 1.1em)
  (li ((:and p :first-child) :margin 0))
  (pre :font-size 0.8em)
  (code :background (hex F0F0F0)
