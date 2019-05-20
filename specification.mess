@@ -59,7 +59,8 @@ The rationale for the ten octets in the identifier is as follows:
 - ``E0D0`` An invalid UTF-8 octet sequence to hard-crash text readers.
 - ``0D0A0A`` A CRLFLF sequence to catch bad line conversion utilities.
 
-The ``Header`` and ``Payload`` will be described by the individual formats. The following format mapping is used:
+The ``Header`` and ``Payload`` will be described by the individual formats.
+The values for the ``format-id`` are interpreted as follows:
 
 - ``00`` --- Text
 - ``01`` --- Image
@@ -84,7 +85,7 @@ format     --- A single octet identifying the per-sample data type.
 sample     --- A single-channel sample value in the format indicated by format.
 ::
 
-The format is identified as one of the following:
+The values for ``format`` are interpreted as follows:
 
 - ``01`` --- ``int8``
 - ``02`` --- ``int16``
@@ -99,6 +100,7 @@ The format is identified as one of the following:
 - ``24`` --- ``float32``
 - ``28`` --- ``float64``
 
+Any other value for ``format`` is invalid. 
 The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits.
 
 ## Image
@@ -119,7 +121,7 @@ channel       --- A single-channel colour value in the format indicated by forma
 channel-count --- The number of channels indicated by channels.
 ::
 
-The format is identified as one of the following:
+The values for ``format`` are interpreted as follows:
 
 - ``01`` --- ``int8``
 - ``02`` --- ``int16``
@@ -133,7 +135,8 @@ The format is identified as one of the following:
 - ``24`` --- ``float32``
 - ``28`` --- ``float64``
 
-The channels are identified as one of the following:
+Any other value for ``format`` is invalid. 
+The values for ``channels`` are interpreted as follows:
 
 - ``01`` --- ``R``
 - ``02`` --- ``RG``
@@ -145,10 +148,11 @@ The channels are identified as one of the following:
 - ``24`` --- ``ARGB``
 - ``34`` --- ``BGRA``
 
+Any other value for ``channels`` is invalid.
 The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` number of bits.
 
 ## Model
-This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular meshes.
+This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular or non-static meshes. If animation of the model is desired, animation information can be delivered separately.
 
 :: BNF
 Header         ::= format material-type Count
@@ -169,7 +173,7 @@ material-count --- The number of material textures as indicated by material-type
 vertex         --- A single-vertex value in the format indicated by format.
 ::
 
-The following formats are recognised, and describe the layout of the ``vertex``:
+The values for ``format`` are interpreted as follows, and describe the layout of the ``vertex``:
 
 - ``10`` --- ``Position``
 - ``20`` --- ``Position`` ``UV``
@@ -179,7 +183,8 @@ The following formats are recognised, and describe the layout of the ``vertex``:
 - ``31`` --- ``Position`` ``Color`` ``Normal``
 - ``40`` --- ``Position`` ``UV`` ``Normal`` ``Tangent``
 
-The following material-types are recognised, and describe the usage and number of ``Texture``s.
+Any other value for ``format`` is invalid. 
+The values for ``material-type`` are interpreted as follows, and describe the usage and number of ``Texture``s:
 
 - ``00`` ---
 - ``10`` --- Albedo
@@ -195,7 +200,8 @@ The following material-types are recognised, and describe the usage and number o
 - ``51`` --- Albedo Normal Metalness Roughness Occlusion
 - ``60`` --- Albedo Normal Metalness Roughness Occlusion Emission
 
-Where the Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively. Each ``Texture`` is a length-prefixed string of a file path to an image file relative to the model file's own path.
+Any other value for ``material-type`` is invalid.
+The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively. Each ``Texture`` is a length-prefixed string of a file path to an image file relative to the model file's own path.
 
 ## Text
 The text format identifies the character encoding used, followed by the raw text payload. Essentially this means it is a regular "text file", but with a header that identifies the actual encoding used and thus liberates the need for encoding detecting kludges.
@@ -207,7 +213,7 @@ encoding --- A single octet identifying a text encoding.
 text     --- A sequence of octets in the encoding described by the header.
 ::
 
-The following encodings are recognised:
+The values for ``encoding`` are interpreted as follows:
 
 - ``00`` --- US-ASCII
 - ``10`` --- UTF-8
