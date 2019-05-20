@@ -21,24 +21,26 @@ SF3 formats follow these principles:
 The format specifications in this document use a BNF-style abstract syntax language. The language is defined here:
 
 :: BNF
-Format      ::= Definition+
-Definition  ::= Rule Identifier? Description? '\n'
-Identifier  ::= '::=' Sequence
-Description ::= '---' text
-Sequence    ::= Composition (' ' Composition)*
-Composition ::= (Rule | OctetArray | Octet | Type | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
-OctetArray  ::= '[' (octet | ascii) (' ' (octet | ascii))* ']'
-Type        ::= 'int8' | 'int16' | 'int32' | 'int64' | 'uint8' | 'uint16' | 'uint32' | 'uint64' | 'float16' | 'float32' | 'float64' | ('string' ExactNumber)
-Rule        ::= name
-OneOrMore   ::= '+'
-AnyNumber   ::= '*'
-ExactNumber ::= '{' number '}'
+Format       ::= Definition+
+Definition   ::= Rule Identifier? Description? '\n'
+Identifier   ::= '::=' Sequence
+Description  ::= '---' text
+Sequence     ::= Composition (' ' Composition)*
+Composition  ::= (Rule | OctetArray | Octet | Type | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
+OctetArray   ::= '[' (octet | ascii) (' ' (octet | ascii))* ']'
+Type         ::= ('int' | 'uint') IntBittage | 'float' FloatBittage | 'string' ExactNumber
+IntBittage   ::= '8' | '16' | '24' | '32' | '64'
+FloatBittage ::= '16' | '32' | '64'
+Rule         ::= name
+OneOrMore    ::= '+'
+AnyNumber    ::= '*'
+ExactNumber  ::= '{' number '}'
 
-name        --- The name of a rule as a sequence of non-numeric ASCII characters.
-octet       --- Eight bits expressed as two hexadecimal digits.
-ascii       --- Eight bits expressed as an ASCII character whose codepoint is the octet value.
-text        --- Human-readable textual description of the contents.
-number      --- A textual description of the number of occurrences. Can make a reference to other rules, in which case the rule's content designates a runtime number.
+name         --- The name of a rule as a sequence of non-numeric ASCII characters.
+octet        --- Eight bits expressed as two hexadecimal digits.
+ascii        --- Eight bits expressed as an ASCII character whose codepoint is the octet value.
+text         --- Human-readable textual description of the contents.
+number       --- A textual description of the number of occurrences. Can make a reference to other rules, in which case the rule's content designates a runtime number.
 ::
 
 White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a UTF-8 encoded character sequence with an octet length as indicated by the required following ``ExactNumber`` rule.
@@ -57,7 +59,7 @@ The rationale for the ten octets in the identifier is as follows:
 - ``81`` An octet to stop byte-peekers from determining text. The octet lies in the undefined ranges of ASCII, ISO-8859-1, Windows-1252, and SJIS.
 - ``SF3`` ASCII identifier for human-readability.
 - ``00`` A null octet to stop C-string utilities from trying to munch the rest of the file.
-- ``E0D0`` An invalid UTF-8 octet sequence to hard-crash text readers.
+- ``E0D0`` An invalid UTF-8 octet sequence.
 - ``0D0A0A`` A CRLFLF sequence to catch bad line conversion utilities.
 
 The ``Header`` and ``Payload`` will be described by the individual formats.
@@ -88,18 +90,18 @@ sample     --- A single-channel sample value in the format indicated by format.
 
 The values for ``format`` are interpreted as follows:
 
-- ``01`` --- ``int8``
-- ``02`` --- ``int16``
-- ``03`` --- ``int24``
-- ``04`` --- ``int32``
-- ``08`` --- ``int64``
+- ``10`` --- ``int8``
+- ``20`` --- ``int16``
+- ``30`` --- ``int24``
+- ``40`` --- ``int32``
+- ``80`` --- ``int64``
 - ``11`` --- ``uint8``
-- ``12`` --- ``uint16``
-- ``13`` --- ``uint24``
-- ``14`` --- ``uint32``
-- ``18`` --- ``uint64``
-- ``24`` --- ``float32``
-- ``28`` --- ``float64``
+- ``21`` --- ``uint16``
+- ``31`` --- ``uint24``
+- ``41`` --- ``uint32``
+- ``81`` --- ``uint64``
+- ``42`` --- ``float32``
+- ``82`` --- ``float64``
 
 Any other value for ``format`` is invalid. 
 The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits.
@@ -124,30 +126,30 @@ channel-count --- The number of channels indicated by channels.
 
 The values for ``format`` are interpreted as follows:
 
-- ``01`` --- ``int8``
-- ``02`` --- ``int16``
-- ``04`` --- ``int32``
-- ``08`` --- ``int64``
+- ``10`` --- ``int8``
+- ``20`` --- ``int16``
+- ``40`` --- ``int32``
+- ``80`` --- ``int64``
 - ``11`` --- ``uint8``
-- ``12`` --- ``uint16``
-- ``14`` --- ``uint32``
-- ``18`` --- ``uint64``
+- ``21`` --- ``uint16``
+- ``41`` --- ``uint32``
+- ``81`` --- ``uint64``
 - ``22`` --- ``float16``
-- ``24`` --- ``float32``
-- ``28`` --- ``float64``
+- ``42`` --- ``float32``
+- ``82`` --- ``float64``
 
 Any other value for ``format`` is invalid. 
 The values for ``channels`` are interpreted as follows:
 
-- ``01`` --- ``R``
-- ``02`` --- ``RG``
-- ``03`` --- ``RGB``
-- ``04`` --- ``RGBA``
-- ``12`` --- ``GR``
-- ``13`` --- ``BGR``
-- ``14`` --- ``ABGR``
-- ``24`` --- ``ARGB``
-- ``34`` --- ``BGRA``
+- ``10`` --- ``R``
+- ``20`` --- ``RG``
+- ``30`` --- ``RGB``
+- ``40`` --- ``RGBA``
+- ``21`` --- ``GR``
+- ``31`` --- ``BGR``
+- ``41`` --- ``ABGR``
+- ``42`` --- ``ARGB``
+- ``43`` --- ``BGRA``
 
 Any other value for ``channels`` is invalid.
 The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` number of bits.
