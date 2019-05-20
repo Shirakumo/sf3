@@ -22,7 +22,8 @@ The format specifications in this document use a BNF-style abstract syntax langu
 
 :: BNF
 Format      ::= Definition+
-Definition  ::= Rule '::=' Sequence Description? '\n'
+Definition  ::= Rule Identifier? Description? '\n'
+Identifier  ::= '::=' Sequence
 Description ::= '---' text
 Sequence    ::= Composition (' ' Composition)*
 Composition ::= (Rule | OctetArray | Octet | Type | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
