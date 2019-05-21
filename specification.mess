@@ -74,7 +74,25 @@ The values for the ``format-id`` are interpreted as follows:
 Any other value for the ``format-id`` is invalid.
 
 ## Archive
-Todo
+The Archive format allows storing multiple files in one binary package. The file also includes some metadata so that the files can be stored with a relative path and mime-type, allowing both file-system extraction, and content inspection without explicit extraction.
+
+:: BNF
+Header       ::= Count MetadataSize
+Payload      ::= Metadata Files
+MetadataSize ::= uint32                --- The octet size of the Metadata payload.
+Metadata     ::= EntryOffset{Count} MetaEntry{Count}
+EntryOffset  ::= uint32                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
+MetaEntry    ::= FileSize Mime Path    --- A descriptor of file size, mime type, and path.
+FileSize     ::= uint32                --- The size of the corresponding file in bytes.
+Mime         ::= uint8 string{uint8}   --- The mime-type of the corresponding file.
+Path         ::= uint16 string{uint16} --- The relative path of the corresponding file.
+Files        ::= FileOffset{Count} File{Count}
+FileOffset   ::= uint32                --- The octet offset of the corresponding File from the beginning of Files. 
+File         ::= uint8{OctetSize}      --- A binary file payload.
+::
+
+The included ``MetadataSize``, ``EntryOffset``, and ``FileOffset`` fields should allow constant-time access to any content within the archive.
+If no mime-type is known for a file that should be stored, the corresponding ``Mime`` should be set to ``application/octet-stream``.
 
 ## Audio
 This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.
@@ -158,13 +176,14 @@ The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` n
 This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular or non-static meshes. If animation of the model is desired, animation information can be delivered separately.
 
 :: BNF
-Header         ::= format material-type Count
+Header         ::= format material-type MaterialSize Count
 Payload        ::= Material Faces Vertices
-Count          ::= uint32
-Material       ::= Texture{material-count}
-Texture        ::= uint16 string{uint16}
-Faces          ::= uint32{Count}
-Vertices       ::= vertex{Count}
+MaterialSize   ::= uint32                  --- The octet size of the Material payload.
+Count          ::= uint32                  --- The number of entries in the Faces array.
+Material       ::= Texture{material-count} --- An array of texture maps for the model's material.
+Texture        ::= uint16 string{uint16}   --- A relative file path to an image.
+Faces          ::= uint32{Count}           --- An array of 0-based indices into the Vertices array.
+Vertices       ::= vertex*
 Position       ::= float32 float32 float32 --- A vertex position in model-space.
 UV             ::= float32 float32         --- A texture coordinate in texture-space.
 Color          ::= float32 float32 float32 --- An RGB colour triplet, each channel in [0,1].
@@ -204,7 +223,9 @@ The values for ``material-type`` are interpreted as follows, and describe the us
 - ``60`` --- Albedo Normal Metalness Roughness Occlusion Emission
 
 Any other value for ``material-type`` is invalid.
-The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively. Each ``Texture`` is a length-prefixed string of a file path to an image file relative to the model file's own path.
+The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively.
+
+The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. The number of ``vertex`` entries in the ``Vertices`` should be as high as the highest index in the ``Faces`` array, and cannot exceed ``Count``. Similarly, each entry in the ``Faces`` array must be lower than ``Count``.
 
 ## Text
 The text format identifies the character encoding used, followed by the raw text payload. Essentially this means it is a regular "text file", but with a header that identifies the actual encoding used and thus liberates the need for encoding detecting kludges.
