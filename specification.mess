@@ -216,7 +216,7 @@ The values for ``format`` are interpreted as follows, and describe the layout of
 Any other value for ``format`` is invalid. 
 The values for ``material-type`` are interpreted as follows, and describe the usage and number of ``Texture``s:
 
-- ``00`` ---
+- ``00`` --- (no material)
 - ``10`` --- Albedo
 - ``20`` --- Albedo Normal
 - ``21`` --- Albedo Emission
@@ -289,7 +289,7 @@ The values for ``encoding`` are interpreted as follows:
 Any other value for the ``encoding`` is invalid.
 
 ### Use-Case
-This format us useful for storing textual content without encoding ambiguities, making it possible to transfer text without having to pay the overhead that certain encodings can impose.
+This format is useful for storing textual content without encoding ambiguities, making it possible to transfer text without having to pay the overhead that certain encodings can impose.
 
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
