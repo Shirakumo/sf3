@@ -27,7 +27,7 @@ Identifier   ::= '::=' Sequence
 Description  ::= '---' text
 Sequence     ::= Composition (' ' Composition)*
 Composition  ::= (Rule | OctetArray | Octet | Type | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
-OctetArray   ::= '[' (octet | ascii) (' ' (octet | ascii))* ']'
+OctetArray   ::= '[' octet (' ' octet)* ']'
 Type         ::= ('int' | 'uint') IntBittage | 'float' FloatBittage | 'string' ExactNumber
 IntBittage   ::= '8' | '16' | '24' | '32' | '64'
 FloatBittage ::= '16' | '32' | '64'
@@ -38,7 +38,6 @@ ExactNumber  ::= '{' number '}'
 
 name         --- The name of a rule as a sequence of non-numeric ASCII characters.
 octet        --- Eight bits expressed as two hexadecimal digits.
-ascii        --- Eight bits expressed as an ASCII character whose codepoint is the octet value.
 text         --- Human-readable textual description of the contents.
 number       --- A textual description of the number of occurrences. Can make a reference to other rules, in which case the rule's content designates a runtime number.
 ::
@@ -50,14 +49,14 @@ Each format is made up of the following structure, where a valid file must begin
 
 :: BNF
 File       ::= Identifier Header Payload
-Identifier ::= [ 81 S F 3 00 E0 D0 0D 0A 0A ] format-id
+Identifier ::= [ 81 53 46 33 00 E0 D0 0D 0A 0A ] format-id
 format-id  --- A single octet identifying the format.
 ::
 
 The rationale for the ten octets in the identifier is as follows:
 
 - ``81`` An octet to stop byte-peekers from determining text. The octet lies in the undefined ranges of ASCII, ISO-8859-1, Windows-1252, and SJIS.
-- ``SF3`` ASCII identifier for human-readability.
+- ``53 46 33`` ASCII sequence spelling ``SF3`` for human-readability.
 - ``00`` A null octet to stop C-string utilities from trying to munch the rest of the file.
 - ``E0D0`` An invalid UTF-8 octet sequence.
 - ``0D0A0A`` A CRLFLF sequence to catch bad line conversion utilities.
