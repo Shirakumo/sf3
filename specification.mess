@@ -93,6 +93,9 @@ File         ::= uint8{OctetSize}      --- A binary file payload.
 The included ``MetadataSize``, ``EntryOffset``, and ``FileOffset`` fields should allow constant-time access to any content within the archive.
 If no mime-type is known for a file that should be stored, the corresponding ``Mime`` should be set to ``application/octet-stream``.
 
+### Use-Case
+This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.
+
 ## Audio
 This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.
 
@@ -122,6 +125,9 @@ The values for ``format`` are interpreted as follows:
 
 Any other value for ``format`` is invalid. 
 The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits.
+
+### Use-Case
+This format is useful for raw audio data storage, which means it should be trivial to feed into an audio playback system with minimal overhead. Unlike the traditional uncompressed audio format, Wave, this follows a much clearer and simpler specification with sensible metadata encoding.
 
 ## Image
 This format is for storing raw image data. Unlike plain data however, it includes a header that completely identifies the pixel data layout and format. The format supports 3D images as well.
@@ -170,6 +176,9 @@ The values for ``channels`` are interpreted as follows:
 
 Any other value for ``channels`` is invalid.
 The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` number of bits.
+
+### Use-Case
+This format is useful for storing raw bitmap data that can be directly memory-mapped and read out. This is especially convenient for GPU texture uploads with DirectX, OpenGL, Vulkan, or similar.
 
 ## Model
 This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular or non-static meshes. If animation of the model is desired, animation information can be delivered separately.
@@ -226,6 +235,9 @@ The Metallic texture is a combination of Metalness, Roughness, and Occlusion in 
 
 The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. The number of ``vertex`` entries in the ``Vertices`` should be as high as the highest index in the ``Faces`` array, and cannot exceed ``Count``. Similarly, each entry in the ``Faces`` array must be lower than ``Count``.
 
+### Use-Case
+This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
+
 ## Text
 The text format identifies the character encoding used, followed by the raw text payload. Essentially this means it is a regular "text file", but with a header that identifies the actual encoding used and thus liberates the need for encoding detecting kludges.
 
@@ -275,6 +287,9 @@ The values for ``encoding`` are interpreted as follows:
 - ``52`` --- GBK
 
 Any other value for the ``encoding`` is invalid.
+
+### Use-Case
+This format us useful for storing textual content without encoding ambiguities, making it possible to transfer text without having to pay the overhead that certain encodings can impose.
 
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
