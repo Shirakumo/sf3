@@ -1,5 +1,4 @@
-(asdf:load-system :cl-markless-plump)
-(asdf:load-system :clip)
+(ql:quickload '(:clip :cl-markless-plump))
 
 (defvar *here* (make-pathname :name NIL :type NIL
                               :defaults #.(or *load-pathname*
