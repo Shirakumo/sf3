@@ -1,0 +1,25 @@
+(body
+ :font-family sans-serif
+ :font-size 13pt
+ :max-width 800px
+ :margin 0 auto
+ (.alert
+  :border 3px solid (hex FF0000)
+  :background (hex FF0000)
+  :color (hex FFFFFF)
+  :padding 0.2em
+  :margin 1em
+  (header
+   :font-weight bold
+   :font-size 1.5em))
+ (article
+  :text-align justify
+  (h1 :font-size 1.6em)
+  (h2 :font-size 1.3em)
+  (h3 :font-size 1.1em)
+  (li ((:and p :first-child) :margin 0))
+  (pre :font-size 0.8em)
+  (code :background (hex F0F0F0)
+        :padding 0.1em)
+  (.code-block
+   :overflow-x auto)))
