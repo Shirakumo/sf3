@@ -78,17 +78,17 @@ The Archive format allows storing multiple files in one binary package. The file
 :: BNF
 Header       ::= Count MetadataSize
 Payload      ::= Metadata Files
-Count        ::= uint32                --- The number of entries.
+Count        ::= uint64                --- The number of entries.
 MetadataSize ::= uint32                --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
-EntryOffset  ::= uint32                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
+EntryOffset  ::= uint64                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
 MetaEntry    ::= FileSize Mime Path    --- A descriptor of file size, mime type, and path.
-FileSize     ::= uint32                --- The size of the corresponding file in bytes.
+FileSize     ::= uint64                --- The size of the corresponding file in octets.
 Mime         ::= uint8 string{uint8}   --- The mime-type of the corresponding file.
 Path         ::= uint16 string{uint16} --- The relative path of the corresponding file.
-Files        ::= FileOffset{Count} File{Count}
-FileOffset   ::= uint32                --- The octet offset of the corresponding File from the beginning of Files. 
-File         ::= uint8{OctetSize}      --- A binary file payload.
+Files        ::= FileOffset{Count+1} File{Count}
+FileOffset   ::= uint64                --- The octet offset of the corresponding File from the beginning of Files.
+File         ::= uint8{OctetSize}      --- A binary file payload. The OctetSize is computed from two adjacent FileOffset entries.
 ::
 
 The included ``MetadataSize``, ``EntryOffset``, and ``FileOffset`` fields should allow constant-time access to any content within the archive.
@@ -125,7 +125,7 @@ The values for ``format`` are interpreted as follows:
 - ``82`` --- ``float64``
 
 Any other value for ``format`` is invalid. 
-The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits.
+The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits. For a finite file it can be figured out by subtracting the header size from the file size.
 
 ### Use-Case
 This format is useful for raw audio data storage, which means it should be trivial to feed into an audio playback system with minimal overhead. Unlike the traditional uncompressed audio format, Wave, this follows a much clearer and simpler specification with sensible metadata encoding.
