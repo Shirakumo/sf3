@@ -78,6 +78,7 @@ The Archive format allows storing multiple files in one binary package. The file
 :: BNF
 Header       ::= Count MetadataSize
 Payload      ::= Metadata Files
+Count        ::= uint32                --- The number of entries.
 MetadataSize ::= uint32                --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
 EntryOffset  ::= uint32                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
