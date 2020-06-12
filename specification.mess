@@ -69,6 +69,7 @@ The values for the ``format-id`` are interpreted as follows:
 - ``02`` --- Audio
 - ``03`` --- Model
 - ``04`` --- Archive
+- ``05`` --- Log
 
 Any other value for the ``format-id`` is invalid.
 
@@ -180,6 +181,32 @@ The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` n
 
 ### Use-Case
 This format is useful for storing raw bitmap data that can be directly memory-mapped and read out. This is especially convenient for GPU texture uploads with DirectX, OpenGL, Vulkan, or similar.
+
+## Log
+This format is for storing generic logging and event information.
+
+:: BNF
+Header    ::= StartTime
+Payload   ::= Entry*
+StartTime ::= uint64                        --- The number of seconds since the Unix epoch (1st of January 1970 UTC) at which this log begins.
+Entry     ::= Size Time Severity Source Category Message
+Size      ::= uint32                        --- The size of the remaining log entry in octets.
+Time      ::= uint64                        --- The number of milliseconds since StartTime at which this log entry was recorded.
+Severity  ::= int8                          --- The severity or importance of the log entry.
+Source    ::= uint8 string{uint8}           --- An identifier of the source of the log entry.
+Category  ::= uint8 string{uint8}           --- An identifier of the category the entry belongs to.
+Message   ::= string{remaining}             --- A human-readable message describing the event.
+remaining --- The remaining number of octets in the Entry. This can be obtained by subtracting the size of the Source, Category, Time, and Severity from the Size of the Entry.
+::
+
+The ``severity`` should be zero if the message is of neutral importance, positive for increasingly vital information, and negative for increasingly detailed information.
+
+Both the ``Source`` and ``Category`` may consist of just a null byte each if the information is not relevant.
+
+This file format is designed such that applications can append data directly to the file to create new log entries.
+
+### Use-Case
+This format is useful for basic logging purposes in applications that run for a longer amount of time.The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
 
 ## Model
 This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular or non-static meshes. If animation of the model is desired, animation information can be delivered separately.
@@ -301,6 +328,7 @@ The mime-types for SF3 files should be as follows, according to the format used:
 - **Archive** ``application/x.sf3-archive``
 - **Audio** ``audio/x.sf3``
 - **Image** ``image/x.sf3``
+- **Log** ``application/x.sf3-log``
 - **Model** ``model/x.sf3``
 - **Text** ``text/x.sf3``
 
@@ -312,5 +340,6 @@ The file extension should always end with ``.sf3``. Specifically, for the format
 - **Archive** ``.ar.sf3``
 - **Audio** ``.au.sf3``
 - **Image** ``.img.sf3``
+- **Log** ``.log.sf3``
 - **Model** ``.mod.sf3``
 - **Text** ``.txt.sf3``
