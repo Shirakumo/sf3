@@ -17,6 +17,17 @@ SF3 formats follow these principles:
 - **Similar layout**
   Each format in the family follows a very similar format of identifier, header, and payload. This ensures that the files remain easy to parse, understand, and debug.
 
+# Nomenclature
+The following clarifies how to interpret certain words in regards to this standard:
+
+- **file** -- A bounded sequence of octets that should be interpreted as having a structure of one of the formats outlined in this standard.
+- **implementation** -- A program that is capabale of interpreting files in accordance with this specification.
+- **must** -- If a file should violate this requirement, it is invalid and must be rejected by the implementation.
+- **must not** -- If a file should meet this requirement, it is invalid and must be rejected by the implementation.
+- **should** -- It is heavily recommended to follow this requirement, however implementations must be able to handle the case where this requirement is not met.
+- **should not** -- It is heavily recommended not to follow this requirement, however implementations must be able to handle cases where it is met.
+- **may** -- The behaviour is optional, however implementations must be able to handle it.
+
 # Specification Description
 The format specifications in this document use a BNF-style abstract syntax language. The language is defined here:
 
@@ -262,7 +273,7 @@ The values for ``material-type`` are interpreted as follows, and describe the us
 Any other value for ``material-type`` is invalid.
 The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively.
 
-The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. The number of ``vertex`` entries in the ``Vertices`` should be as high as the highest index in the ``Faces`` array, and cannot exceed ``Count``. Similarly, each entry in the ``Faces`` array must be lower than ``Count``.
+The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. The number of ``vertex`` entries in the ``Vertices`` should be as high as the highest index in the ``Faces`` array, and must not exceed ``Count``. Similarly, each entry in the ``Faces`` array must be lower than ``Count``.
 
 ### Use-Case
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
