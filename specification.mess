@@ -70,6 +70,7 @@ The values for the ``format-id`` are interpreted as follows:
 - ``03`` --- Model
 - ``04`` --- Archive
 - ``05`` --- Log
+- ``06`` --- Vector Graphic
 
 Any other value for the ``format-id`` is invalid.
 
@@ -319,6 +320,57 @@ Any other value for the ``encoding`` is invalid.
 ### Use-Case
 This format is useful for storing textual content without encoding ambiguities, making it possible to transfer text without having to pay the overhead that certain encodings can impose.
 
+## Vector Graphic
+This format offers a relatively simple but capable vector graphic format for scalable images.
+
+:: BNF
+Header       ::= Width Height Count
+Payload      ::= Instruction{Count}
+Width        ::= uint32                          --- The width of the visible canvas in units.
+Height       ::= uint32                          --- The height of the visible canvas in units.
+Count        ::= uint32                          --- The number of instructions to appear.
+Instruction  ::= Element | Transform
+Element      ::= Line | Rectangle | Circle | Polygon | Curve
+Line         ::= [ 01 ] Color Thickness ShapeOutline
+                                                 --- A sequence of connected line segments.
+Rectangle    ::= [ 02 ] ShapeFill ShapeBounds    --- An axis-aligned rectangle.
+Circle       ::= [ 03 ] ShapeFill ShapeBounds    --- An axis-aligned oval circle.
+Polygon      ::= [ 04 ] ShapeFill ShapeOutline   --- A many-edged convex polygon.
+Curve        ::= [ 05 ] ShapeFill ControlPoints Point{Edges}
+                                                 --- A Bezier curve directed by its control points.
+Text         ::= [ 06 ] Color Thickness Point Font Text
+                                                 --- A single line of text.
+Font         ::= uint16 string{uint16}           --- The name of the font family to use to render the text.
+Text         ::= uint16 string{uint16}           --- The string of text to be displayed
+Transform    ::= Identity | Matrix
+Identity     ::= [ 10 ]                          --- A reset of the current transform matrix to the 3x3 identity matrix.
+Matrix       ::= [ 11 ] float32{9}               --- A coordinate transform matrix to be applied to subsequent instructions.
+ShapeOutline ::= Edges Point{Edges}              --- A list of edge points of a composite shape.
+ShapeBounds  ::= Point Size                      --- The bounding box of a shape.
+ShapeFill    ::= Color Color Thickness           --- The fill color, outline color, and outline thickness.
+Point        ::= float32 float32                 --- A position in x/y.
+Size         ::= float32 float32                 --- The bounding size of a shape in width/height.
+Color        ::= float32 float32 float32 float32 --- An RGBA colour quadruplet in the range of [0, 1].
+Edges        ::= uint16                          --- The number of points to appear in the edge list.
+Thickness    ::= float32                         --- The thickness of the outline in units.
+::
+
+The coordinate system should be defined with X growing to the right, Y growing upwards, and the origin being in the lower left corner of the canvas. Whenever a ``Transform`` is applied, the given matrix must be applied to all following ``Element``s until the next ``Transform``. This transformation applies to the shape as a whole, not just the ``Point``s that define it in the file.
+
+When an element with a ``ShapeFill`` should be drawn, the fill must be drawn first, with the outline (if visible) second on top. If the shape is bounded by ``ShapeBounds``, the fill should meet the bounds, and the outline should be centred on the bounds when hitting them. If the shape is bounded by a ``ShapeOutline``, the outline must be drawn centered on the lines defined by the ``Edge``s.
+
+For ``Curve`` and ``Polygon``, if the ``Point``s do not form a closed shape, the fill should be drawn as a closed shape by directly connecting the first and last points with a straight line.
+
+In the case of the ``Curve``, the edges should be interpreted as follows: ``EdgePoint ControlPoint (ControlPoint EdgePoint ControlPoint)* ControlPoint EdgePoint``. As such, the ``Edges`` number for a ``Curve`` must always match ``4+3x``. Any other value is an error.
+
+In the case of ``Polygon`` and ``Rectangle``, the ``Edges`` number must be at least ``2``. Any other value is an error.
+
+For the ``Size``, ``Thickness``, and ``Color``, all float components must be positive and real. Infinities, NaNs, and negative numbers are an error.
+
+For the ``Point`` and ``Matrix``, all float components must be real. Infinities and NaNs are an error.
+
+### Use-Case
+
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
 
@@ -331,11 +383,12 @@ The mime-types for SF3 files should be as follows, according to the format used:
 - **Log** ``application/x.sf3-log``
 - **Model** ``model/x.sf3``
 - **Text** ``text/x.sf3``
+- **Vector Graphic** ``image/x.sf3-vector``
 
 If a general SF3 file should be designated, the mime-type should be ``application/x.sf3``. If/when the IANA registration for an official mime-type is approved, the ``x.`` prefix may be dropped.
 
 ## File Extension
-The file extension should always end with ``.sf3``. Specifically, for the formats the following extended extensions may be used:
+The file extension should always end with ``.sf3``. Specifically, for the formats the following extended extensions //may// be used:
 
 - **Archive** ``.ar.sf3``
 - **Audio** ``.au.sf3``
@@ -343,3 +396,4 @@ The file extension should always end with ``.sf3``. Specifically, for the format
 - **Log** ``.log.sf3``
 - **Model** ``.mod.sf3``
 - **Text** ``.txt.sf3``
+- **Vector Graphic** ``.vec.sf3``
