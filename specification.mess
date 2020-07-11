@@ -349,10 +349,10 @@ Circle       ::= [ 03 ] ShapeFill ShapeBounds    --- An axis-aligned oval circle
 Polygon      ::= [ 04 ] ShapeFill ShapeOutline   --- A many-edged convex polygon.
 Curve        ::= [ 05 ] ShapeFill ControlPoints Point{Edges}
                                                  --- A Bezier curve directed by its control points.
-Text         ::= [ 06 ] Color Thickness Point Font Text
+Text         ::= [ 06 ] Color Point Font FontSize String
                                                  --- A single line of text.
 Font         ::= uint16 string{uint16}           --- The name of the font family to use to render the text.
-Text         ::= uint16 string{uint16}           --- The string of text to be displayed
+String       ::= uint16 string{uint16}           --- The string of text to be displayed
 Transform    ::= Identity | Matrix
 Identity     ::= [ 10 ]                          --- A reset of the current transform matrix to the 3x3 identity matrix.
 Matrix       ::= [ 11 ] float32{9}               --- A coordinate transform matrix to be applied to subsequent instructions.
@@ -364,6 +364,7 @@ Size         ::= float32 float32                 --- The bounding size of a shap
 Color        ::= float32 float32 float32 float32 --- An RGBA colour quadruplet in the range of [0, 1].
 Edges        ::= uint16                          --- The number of points to appear in the edge list.
 Thickness    ::= float32                         --- The thickness of the outline in units.
+FontSize     ::= float32                         --- The size of an em in units.
 ::
 
 The coordinate system should be defined with X growing to the right, Y growing upwards, and the origin being in the lower left corner of the canvas. Whenever a ``Transform`` is applied, the given matrix must be applied to all following ``Element``s until the next ``Transform``. This transformation applies to the shape as a whole, not just the ``Point``s that define it in the file.
@@ -376,11 +377,16 @@ In the case of the ``Curve``, the edges should be interpreted as follows: ``Edge
 
 In the case of ``Polygon`` and ``Rectangle``, the ``Edges`` number must be at least ``2``. Any other value is an error.
 
-For the ``Size``, ``Thickness``, and ``Color``, all float components must be positive and real. Infinities, NaNs, and negative numbers are an error.
+For the ``Size``, ``Thickness``, ``FontSize``, and ``Color``, all float components must be positive and real. Infinities, NaNs, and negative numbers are an error.
 
 For the ``Point`` and ``Matrix``, all float components must be real. Infinities and NaNs are an error.
 
+When rendering ``Text``, the ``Point`` specifies the location of the middle on the baseline of the first character that is rendered.
+
+If a visualiser or editor of a vector graphic file does not have access to the font specified in a ``Font`` field, it //should// generate an error, but //may// exchange the font for a similar one. In either case, it //must// inform the user of the missing font.
+
 ### Use-Case
+This format is useful for representing vector graphics in a light-weight way that should be easy to write a visualiser for. It intentionally does not specify much about text processing and instead leaves most of this up to the implementation.
 
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
