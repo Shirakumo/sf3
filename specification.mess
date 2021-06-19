@@ -61,7 +61,7 @@ Each format is made up of the following structure, where a valid file must begin
 :: BNF
 File       ::= Identifier Header Payload
 Identifier ::= [ 81 53 46 33 00 E0 D0 0D 0A 0A ] format-id
-format-id  --- A single octet identifying the format.
+format-id  ::= uint8 --- A single octet identifying the format.
 ::
 
 The rationale for the ten octets in the identifier is as follows:
@@ -119,24 +119,24 @@ Header     ::= Samplerate Channels format
 Payload    ::= sample{Channels}*
 Samplerate ::= uint32 --- The samplerate in Hz.
 Channels   ::= uint8  --- The number of audio channels.
-format     --- A single octet identifying the per-sample data type.
+format     ::= uint8  --- A single octet identifying the per-sample data type.
 sample     --- A single-channel sample value in the format indicated by format.
 ::
 
 The values for ``format`` are interpreted as follows:
 
-- ``10`` --- ``int8``
-- ``20`` --- ``int16``
-- ``30`` --- ``int24``
-- ``40`` --- ``int32``
-- ``80`` --- ``int64``
+- ``01`` --- ``int8``
+- ``02`` --- ``int16``
+- ``03`` --- ``int24``
+- ``04`` --- ``int32``
+- ``08`` --- ``int64``
 - ``11`` --- ``uint8``
-- ``21`` --- ``uint16``
-- ``31`` --- ``uint24``
-- ``41`` --- ``uint32``
-- ``81`` --- ``uint64``
-- ``42`` --- ``float32``
-- ``82`` --- ``float64``
+- ``12`` --- ``uint16``
+- ``13`` --- ``uint24``
+- ``14`` --- ``uint32``
+- ``18`` --- ``uint64``
+- ``24`` --- ``float32``
+- ``28`` --- ``float64``
 
 Any other value for ``format`` is invalid. 
 The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits. For a finite file it can be figured out by subtracting the header size from the file size.
@@ -156,10 +156,10 @@ Color         ::= channel{channel-count}
 Width         ::= uint32
 Height        ::= uint32
 Depth         ::= uint32
-format        --- A single octet identifying the per-channel data type.
-channels      --- A single octet identifying the number and order of channels.
+format        ::= uint8 --- A single octet identifying the per-channel data type.
+channels      ::= uint8 --- A single octet identifying the number and order of channels.
 channel       --- A single-channel colour value in the format indicated by format.
-channel-count --- The number of channels indicated by channels.
+channel-count --- The number of channels indicated by the lower 4 bits of the channels.
 ::
 
 The values for ``format`` are interpreted as follows:
@@ -179,15 +179,15 @@ The values for ``format`` are interpreted as follows:
 Any other value for ``format`` is invalid. 
 The values for ``channels`` are interpreted as follows:
 
-- ``10`` --- ``R``
-- ``20`` --- ``RG``
-- ``30`` --- ``RGB``
-- ``40`` --- ``RGBA``
-- ``21`` --- ``GR``
-- ``31`` --- ``BGR``
-- ``41`` --- ``ABGR``
-- ``42`` --- ``ARGB``
-- ``43`` --- ``BGRA``
+- ``01`` --- ``R``
+- ``02`` --- ``RG``
+- ``03`` --- ``RGB``
+- ``04`` --- ``RGBA``
+- ``12`` --- ``GR``
+- ``13`` --- ``BGR``
+- ``14`` --- ``ABGR``
+- ``24`` --- ``ARGB``
+- ``34`` --- ``BGRA``
 
 Any other value for ``channels`` is invalid.
 The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` number of bits.
@@ -238,38 +238,38 @@ UV             ::= float32 float32         --- A texture coordinate in texture-s
 Color          ::= float32 float32 float32 --- An RGB colour triplet, each channel in [0,1].
 Normal         ::= float32 float32 float32 --- A surface normal, in tangent-space.
 Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-space.
-format         --- A single octet identifying the per-vertex format.
-material-type  --- A single octet identifying the material used.
+format         ::= uint8                   --- A single octet identifying the per-vertex format.
+material-type  ::= uint8                   --- A single octet identifying the material used.
 material-count --- The number of material textures as indicated by material-type.
 vertex         --- A single-vertex value in the format indicated by format.
 ::
 
 The values for ``format`` are interpreted as follows, and describe the layout of the ``vertex``:
 
-- ``10`` --- ``Position``
-- ``20`` --- ``Position`` ``UV``
-- ``21`` --- ``Position`` ``Color``
+- ``01`` --- ``Position``
+- ``02`` --- ``Position`` ``UV``
+- ``12`` --- ``Position`` ``Color``
 - ``22`` --- ``Position`` ``Normal``
-- ``30`` --- ``Position`` ``UV`` ``Normal``
-- ``31`` --- ``Position`` ``Color`` ``Normal``
-- ``40`` --- ``Position`` ``UV`` ``Normal`` ``Tangent``
+- ``03`` --- ``Position`` ``UV`` ``Normal``
+- ``13`` --- ``Position`` ``Color`` ``Normal``
+- ``04`` --- ``Position`` ``UV`` ``Normal`` ``Tangent``
 
 Any other value for ``format`` is invalid. 
 The values for ``material-type`` are interpreted as follows, and describe the usage and number of ``Texture``s:
 
 - ``00`` --- (no material)
-- ``10`` --- Albedo
-- ``20`` --- Albedo Normal
-- ``21`` --- Albedo Emission
-- ``30`` --- Albedo Normal Specular
-- ``31`` --- Albedo Normal Emission
-- ``32`` --- Albedo Normal Metallic
-- ``40`` --- Albedo Normal Metalness Roughness
-- ``41`` --- Albedo Normal Specular Emission
-- ``42`` --- Albedo Normal Metallic Emission
-- ``50`` --- Albedo Normal Metalness Roughness Emission
-- ``51`` --- Albedo Normal Metalness Roughness Occlusion
-- ``60`` --- Albedo Normal Metalness Roughness Occlusion Emission
+- ``01`` --- Albedo
+- ``02`` --- Albedo Normal
+- ``12`` --- Albedo Emission
+- ``03`` --- Albedo Normal Specular
+- ``13`` --- Albedo Normal Emission
+- ``23`` --- Albedo Normal Metallic
+- ``04`` --- Albedo Normal Metalness Roughness
+- ``14`` --- Albedo Normal Specular Emission
+- ``24`` --- Albedo Normal Metallic Emission
+- ``05`` --- Albedo Normal Metalness Roughness Emission
+- ``15`` --- Albedo Normal Metalness Roughness Occlusion
+- ``06`` --- Albedo Normal Metalness Roughness Occlusion Emission
 
 Any other value for ``material-type`` is invalid.
 The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively.
@@ -285,47 +285,47 @@ The text format identifies the character encoding used, followed by the raw text
 :: BNF
 Header   ::= encoding
 Payload  ::= text
-encoding --- A single octet identifying a text encoding.
+encoding ::= uint8 --- A single octet identifying a text encoding.
 text     --- A sequence of octets in the encoding described by the header.
 ::
 
 The values for ``encoding`` are interpreted as follows:
 
 - ``00`` --- US-ASCII
-- ``10`` --- UTF-8
+- ``01`` --- UTF-8
 - ``11`` --- UTF-16
-- ``12`` --- UTF-32
-- ``20`` --- ISO 8859-1
-- ``21`` --- ISO 8859-2
+- ``21`` --- UTF-32
+- ``02`` --- ISO 8859-1
+- ``12`` --- ISO 8859-2
 - ``22`` --- ISO 8859-3
-- ``23`` --- ISO 8859-4
-- ``24`` --- ISO 8859-5
-- ``25`` --- ISO 8859-6
-- ``26`` --- ISO 8859-7
-- ``27`` --- ISO 8859-8
-- ``28`` --- ISO 8859-9
-- ``29`` --- ISO 8859-10
-- ``2A`` --- ISO 8859-11
-- ``2B`` --- ISO 8859-12
-- ``2C`` --- ISO 8859-13
-- ``2D`` --- ISO 8859-14
-- ``2E`` --- ISO 8859-15
-- ``2F`` --- ISO 8859-16
-- ``30`` --- Windows-874
-- ``31`` --- Windows-1250
-- ``32`` --- Windows-1251
+- ``32`` --- ISO 8859-4
+- ``42`` --- ISO 8859-5
+- ``52`` --- ISO 8859-6
+- ``62`` --- ISO 8859-7
+- ``72`` --- ISO 8859-8
+- ``82`` --- ISO 8859-9
+- ``92`` --- ISO 8859-10
+- ``A2`` --- ISO 8859-11
+- ``B2`` --- ISO 8859-12
+- ``C2`` --- ISO 8859-13
+- ``D2`` --- ISO 8859-14
+- ``E2`` --- ISO 8859-15
+- ``F2`` --- ISO 8859-16
+- ``03`` --- Windows-874
+- ``13`` --- Windows-1250
+- ``23`` --- Windows-1251
 - ``33`` --- Windows-1252
-- ``34`` --- Windows-1253
-- ``35`` --- Windows-1254
-- ``36`` --- Windows-1255
-- ``37`` --- Windows-1256
-- ``40`` --- EUC-CN
-- ``41`` --- EUC-JP
-- ``42`` --- EUC-KR
-- ``43`` --- EUC-TW
-- ``50`` --- Shift JIS
-- ``51`` --- Big5
-- ``52`` --- GBK
+- ``43`` --- Windows-1253
+- ``53`` --- Windows-1254
+- ``63`` --- Windows-1255
+- ``73`` --- Windows-1256
+- ``04`` --- EUC-CN
+- ``14`` --- EUC-JP
+- ``24`` --- EUC-KR
+- ``34`` --- EUC-TW
+- ``05`` --- Shift JIS
+- ``15`` --- Big5
+- ``25`` --- GBK
 
 Any other value for the ``encoding`` is invalid.
 
