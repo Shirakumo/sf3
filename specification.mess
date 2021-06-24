@@ -46,14 +46,22 @@ Rule         ::= name
 OneOrMore    ::= '+'
 AnyNumber    ::= '*'
 ExactNumber  ::= '{' number '}'
+Switch       ::= '<' Rule SwitchCase ('|' SwitchCase)* '>'
+SwitchCase   ::= octet+ ':' Sequence
+BitRange     ::= Rule '/' (mask ',')? mask
 
 name         --- The name of a rule as a sequence of non-numeric ASCII characters.
 octet        --- Eight bits expressed as two hexadecimal digits.
 text         --- Human-readable textual description of the contents.
 number       --- A textual description of the number of occurrences. Can make a reference to other rules, in which case the rule's content designates a runtime number.
+mask         --- A textual description of the number of bits to use.
 ::
 
 White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a UTF-8 encoded character sequence with an octet length as indicated by the required following ``ExactNumber`` rule.
+
+A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``. 
+
+A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x/2,4`` with ``x`` being the binary sequence ``101101`` would evaluate to ``11``.
 
 # Formats
 Each format is made up of the following structure, where a valid file must begin with the ``File`` rule.
@@ -120,23 +128,19 @@ Payload    ::= sample{Channels}*
 Samplerate ::= uint32 --- The samplerate in Hz.
 Channels   ::= uint8  --- The number of audio channels.
 format     ::= uint8  --- A single octet identifying the per-sample data type.
-sample     --- A single-channel sample value in the format indicated by format.
+sample     ::= <format 01: int8
+                     | 02: int16
+                     | 04: int32
+                     | 08: int64
+                     | 11: uint8
+                     | 12: uint16
+                     | 14: uint32
+                     | 18: uint64
+                     | 22: float16
+                     | 24: float32
+                     | 28: float64>
+                          ---  A single-channel colour value in the format indicated by format.
 ::
-
-The values for ``format`` are interpreted as follows:
-
-- ``01`` --- ``int8``
-- ``02`` --- ``int16``
-- ``03`` --- ``int24``
-- ``04`` --- ``int32``
-- ``08`` --- ``int64``
-- ``11`` --- ``uint8``
-- ``12`` --- ``uint16``
-- ``13`` --- ``uint24``
-- ``14`` --- ``uint32``
-- ``18`` --- ``uint64``
-- ``24`` --- ``float32``
-- ``28`` --- ``float64``
 
 Any other value for ``format`` is invalid. 
 The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits. For a finite file it can be figured out by subtracting the header size from the file size.
@@ -156,25 +160,22 @@ Color         ::= channel{channel-count}
 Width         ::= uint32
 Height        ::= uint32
 Depth         ::= uint32
-format        ::= uint8 --- A single octet identifying the per-channel data type.
-channels      ::= uint8 --- A single octet identifying the number and order of channels.
-channel       --- A single-channel colour value in the format indicated by format.
-channel-count --- The number of channels indicated by the lower 4 bits of the channels.
+format        ::= uint8      --- A single octet identifying the per-channel data type.
+channels      ::= uint8      --- A single octet identifying the number and order of channels.
+channel-count ::= channels/4 --- The number of channels indicated by the lower 4 bits of the channels.
+channel       ::= <format 01: int8
+                        | 02: int16
+                        | 04: int32
+                        | 08: int64
+                        | 11: uint8
+                        | 12: uint16
+                        | 14: uint32
+                        | 18: uint64
+                        | 22: float16
+                        | 24: float32
+                        | 28: float64>
+                             ---  A single-channel colour value in the format indicated by format.
 ::
-
-The values for ``format`` are interpreted as follows:
-
-- ``10`` --- ``int8``
-- ``20`` --- ``int16``
-- ``40`` --- ``int32``
-- ``80`` --- ``int64``
-- ``11`` --- ``uint8``
-- ``21`` --- ``uint16``
-- ``41`` --- ``uint32``
-- ``81`` --- ``uint64``
-- ``22`` --- ``float16``
-- ``42`` --- ``float32``
-- ``82`` --- ``float64``
 
 Any other value for ``format`` is invalid. 
 The values for ``channels`` are interpreted as follows:
@@ -240,21 +241,17 @@ Normal         ::= float32 float32 float32 --- A surface normal, in tangent-spac
 Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-space.
 format         ::= uint8                   --- A single octet identifying the per-vertex format.
 material-type  ::= uint8                   --- A single octet identifying the material used.
-material-count --- The number of material textures as indicated by material-type.
-vertex         --- A single-vertex value in the format indicated by format.
+material-count ::= material-type/4         --- The number of material textures as indicated by material-type.
+vertex         ::= <format 01: Position
+                        |  02: Position UV
+                        |  12: Position Color
+                        |  22: Position Normal
+                        |  03: Position UV Normal
+                        |  13: Position Color Normal
+                        |  04: Position UV Normal Tangent>
+                                            --- A single-vertex value in the format indicated by format.
 ::
 
-The values for ``format`` are interpreted as follows, and describe the layout of the ``vertex``:
-
-- ``01`` --- ``Position``
-- ``02`` --- ``Position`` ``UV``
-- ``12`` --- ``Position`` ``Color``
-- ``22`` --- ``Position`` ``Normal``
-- ``03`` --- ``Position`` ``UV`` ``Normal``
-- ``13`` --- ``Position`` ``Color`` ``Normal``
-- ``04`` --- ``Position`` ``UV`` ``Normal`` ``Tangent``
-
-Any other value for ``format`` is invalid. 
 The values for ``material-type`` are interpreted as follows, and describe the usage and number of ``Texture``s:
 
 - ``00`` --- (no material)
@@ -285,8 +282,8 @@ The text format identifies the character encoding used, followed by the raw text
 :: BNF
 Header   ::= encoding
 Payload  ::= text
-encoding ::= uint8 --- A single octet identifying a text encoding.
-text     --- A sequence of octets in the encoding described by the header.
+encoding ::= uint8  --- A single octet identifying a text encoding.
+text     ::= uint8* --- A sequence of octets in the encoding described by the header.
 ::
 
 The values for ``encoding`` are interpreted as follows:
