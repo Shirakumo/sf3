@@ -139,7 +139,7 @@ sample     ::= <format 01: int8
                      | 22: float16
                      | 24: float32
                      | 28: float64>
-                          ---  A single-channel colour value in the format indicated by format.
+                          ---  A single-channel value in the format indicated by format.
 ::
 
 Any other value for ``format`` is invalid. 
@@ -346,7 +346,7 @@ Rectangle    ::= [ 02 ] ShapeFill ShapeBounds    --- An axis-aligned rectangle.
 Circle       ::= [ 03 ] ShapeFill ShapeBounds    --- An axis-aligned oval circle.
 Polygon      ::= [ 04 ] ShapeFill ShapeOutline   --- A many-edged convex polygon.
 Curve        ::= [ 05 ] ShapeFill ControlPoints Point{Edges}
-                                                 --- A Bezier curve directed by its control points.
+                                                 --- A cubic Bezier curve directed by its control points.
 Text         ::= [ 06 ] Color Point Font FontSize String
                                                  --- A single line of text.
 Font         ::= uint16 string{uint16}           --- The name of the font family to use to render the text.
