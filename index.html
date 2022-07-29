@@ -40,11 +40,12 @@ Count        ::= uint64                --- The number of entries.
 MetadataSize ::= uint64                --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
 EntryOffset  ::= uint64                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
-MetaEntry    ::= FileSize ModTime Mime Path
+MetaEntry    ::= FileSize ModTime Mime Checksum Path
                                        --- A descriptor of file size, mime type, and path.
 FileSize     ::= uint64                --- The size of the corresponding file in octets.
 ModTime      ::= uint64                --- A unix-time timestamp denoting when the file was last modified.
 Mime         ::= uint8 string{uint8}   --- The mime-type of the corresponding file.
+Checksum     ::= uint32                --- A CRC32 checksum.
 Path         ::= uint16 string{uint16} --- The relative path of the corresponding file.
 Files        ::= FileOffset{Count+1} File{Count}
 FileOffset   ::= uint64                --- The octet offset of the corresponding File from the beginning of Files.
