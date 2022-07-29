@@ -61,7 +61,7 @@ White space unless otherwise mandated may be inserted liberally to aid readabili
 
 A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``. 
 
-A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x/2,4`` with ``x`` being the binary sequence ``101101`` would evaluate to ``11``.
+A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x/2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
 
 # Formats
 Each format is made up of the following structure, where a valid file must begin with the ``File`` rule.
@@ -103,8 +103,10 @@ Count        ::= uint64                --- The number of entries.
 MetadataSize ::= uint64                --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
 EntryOffset  ::= uint64                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
-MetaEntry    ::= FileSize Mime Path    --- A descriptor of file size, mime type, and path.
+MetaEntry    ::= FileSize ModTime Mime Path
+                                       --- A descriptor of file size, mime type, and path.
 FileSize     ::= uint64                --- The size of the corresponding file in octets.
+ModTime      ::= uint64                --- A unix-time timestamp denoting when the file was last modified.
 Mime         ::= uint8 string{uint8}   --- The mime-type of the corresponding file.
 Path         ::= uint16 string{uint16} --- The relative path of the corresponding file.
 Files        ::= FileOffset{Count+1} File{Count}
@@ -143,7 +145,7 @@ sample     ::= <format 01: int8
 ::
 
 Any other value for ``format`` is invalid. 
-The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits. For a finite file it can be figured out by subtracting the header size from the file size.
+The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits. For a finite file it can be figured out by subtracting the header size from the file size. If the ``format`` is ``01``, then the samples are stored according to the "A-law" non-linear scheme. Otherwise the samples are linear.
 
 ### Use-Case
 This format is useful for raw audio data storage, which means it should be trivial to feed into an audio playback system with minimal overhead. Unlike the traditional uncompressed audio format, Wave, this follows a much clearer and simpler specification with sensible metadata encoding.
@@ -181,10 +183,10 @@ Any other value for ``format`` is invalid.
 The values for ``channels`` are interpreted as follows:
 
 - ``01`` --- ``R``
-- ``02`` --- ``RG``
+- ``02`` --- ``RA``
 - ``03`` --- ``RGB``
 - ``04`` --- ``RGBA``
-- ``12`` --- ``GR``
+- ``12`` --- ``AR``
 - ``13`` --- ``BGR``
 - ``14`` --- ``ABGR``
 - ``24`` --- ``ARGB``
@@ -227,12 +229,12 @@ This format is for singular triangular meshes only. It does not include a scene 
 
 :: BNF
 Header         ::= format material-type MaterialSize Count
-Payload        ::= Material Faces Vertices
+Payload        ::= Material FaceIndices Vertices
 MaterialSize   ::= uint32                  --- The octet size of the Material payload.
-Count          ::= uint32                  --- The number of entries in the Faces array.
+Count          ::= uint32                  --- The number of entries in the Faces array, must be a multiple of 3.
 Material       ::= Texture{material-count} --- An array of texture maps for the model's material.
 Texture        ::= uint16 string{uint16}   --- A relative file path to an image.
-Faces          ::= uint32{Count}           --- An array of 0-based indices into the Vertices array.
+FaceIndices    ::= uint32{Count}           --- An array of 0-based indices into the Vertices array, every 3 of which describe a face.
 Vertices       ::= vertex*
 Position       ::= float32 float32 float32 --- A vertex position in model-space.
 UV             ::= float32 float32         --- A texture coordinate in texture-space.
@@ -353,7 +355,7 @@ Font         ::= uint16 string{uint16}           --- The name of the font family
 String       ::= uint16 string{uint16}           --- The string of text to be displayed
 Transform    ::= Identity | Matrix
 Identity     ::= [ 10 ]                          --- A reset of the current transform matrix to the 3x3 identity matrix.
-Matrix       ::= [ 11 ] float32{9}               --- A coordinate transform matrix to be applied to subsequent instructions.
+Matrix       ::= [ 11 ] float32{6}               --- A coordinate transform matrix to be applied to subsequent instructions.
 ShapeOutline ::= Edges Point{Edges}              --- A list of edge points of a composite shape.
 ShapeBounds  ::= Point Size                      --- The bounding box of a shape.
 ShapeFill    ::= Color Color Thickness           --- The fill color, outline color, and outline thickness.
@@ -377,7 +379,7 @@ In the case of ``Polygon`` and ``Rectangle``, the ``Edges`` number must be at le
 
 For the ``Size``, ``Thickness``, ``FontSize``, and ``Color``, all float components must be positive and real. Infinities, NaNs, and negative numbers are an error.
 
-For the ``Point`` and ``Matrix``, all float components must be real. Infinities and NaNs are an error.
+For the ``Point`` and ``Matrix``, all float components must be real. Infinities and NaNs are an error. The ``Matrix`` is specified in row-major order, meaning in order the entries are m00 m01 m02 m10 m11 m12.
 
 When rendering ``Text``, the ``Point`` specifies the location of the middle on the baseline of the first character that is rendered.
 
