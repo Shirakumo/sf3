@@ -37,7 +37,7 @@ Definition   ::= Rule Identifier? Description? '\n'
 Identifier   ::= '::=' Sequence
 Description  ::= '---' text
 Sequence     ::= Composition (' ' Composition)*
-Composition  ::= (Rule | OctetArray | Octet | Type | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
+Composition  ::= (Rule | OctetArray | Octet | Type | Switch | BitRange | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
 OctetArray   ::= '[' octet (' ' octet)* ']'
 Type         ::= ('int' | 'uint') IntBittage | 'float' FloatBittage | 'string' ExactNumber
 IntBittage   ::= '8' | '16' | '24' | '32' | '64'
@@ -48,7 +48,7 @@ AnyNumber    ::= '*'
 ExactNumber  ::= '{' number '}'
 Switch       ::= '<' Rule SwitchCase ('|' SwitchCase)* '>'
 SwitchCase   ::= octet+ ':' Sequence
-BitRange     ::= Rule '/' (mask ',')? mask
+BitRange     ::= Rule ':' (mask ',')? mask
 
 name         --- The name of a rule as a sequence of non-numeric ASCII characters.
 octet        --- Eight bits expressed as two hexadecimal digits.
@@ -61,7 +61,7 @@ White space unless otherwise mandated may be inserted liberally to aid readabili
 
 A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``. 
 
-A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x/2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
+A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x:2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
 
 # Formats
 Each format is made up of the following structure, where a valid file must begin with the ``File`` rule.
@@ -164,7 +164,7 @@ Height        ::= uint32
 Depth         ::= uint32
 format        ::= uint8      --- A single octet identifying the per-channel data type.
 channels      ::= uint8      --- A single octet identifying the number and order of channels.
-channel-count ::= channels/4 --- The number of channels indicated by the lower 4 bits of the channels.
+channel-count ::= channels:4 --- The number of channels indicated by the lower 4 bits of the channels.
 channel       ::= <format 01: int8
                         | 02: int16
                         | 04: int32
@@ -243,7 +243,7 @@ Normal         ::= float32 float32 float32 --- A surface normal, in tangent-spac
 Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-space.
 format         ::= uint8                   --- A single octet identifying the per-vertex format.
 material-type  ::= uint8                   --- A single octet identifying the material used.
-material-count ::= material-type/4         --- The number of material textures as indicated by material-type.
+material-count ::= material-type:4         --- The number of material textures as indicated by material-type.
 vertex         ::= <format 01: Position
                         |  02: Position UV
                         |  12: Position Color
