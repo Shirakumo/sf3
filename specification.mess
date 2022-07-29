@@ -118,6 +118,8 @@ octetsize    --- The size of the file, which is computed from FileOffset{n+1}-Fi
 The included ``MetadataSize``, ``EntryOffset``, and ``FileOffset`` fields should allow constant-time access to any content within the archive.
 If no mime-type is known for a file that should be stored, the corresponding ``Mime`` should be set to ``application/octet-stream``.
 
+Each ``EntryOffset`` in ``Metadata``, and each ``FileOffset`` in ``Files`` must be larger than the preceding entry.
+
 ### Use-Case
 This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.
 
