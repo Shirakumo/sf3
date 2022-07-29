@@ -91,7 +91,7 @@ The values for the ``format-id`` are interpreted as follows:
 - ``05`` --- Log
 - ``06`` --- Vector Graphic
 
-Any other value for the ``format-id`` is invalid.
+Any other value for the ``format-id`` is reserved for future formats in this spec. If an implementation only supports a subset of these formats, it must generate an error when it encounters a ``format-id`` that it does not support.
 
 ## Archive
 The Archive format allows storing multiple files in one binary package. The file also includes some metadata so that the files can be stored with a relative path and mime-type, allowing both file-system extraction, and content inspection without explicit extraction.
