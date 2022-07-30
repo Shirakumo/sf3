@@ -103,7 +103,7 @@ Count        ::= uint64                --- The number of entries.
 MetadataSize ::= uint64                --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
 EntryOffset  ::= uint64                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
-MetaEntry    ::= FileSize ModTime Mime Checksum Path
+MetaEntry    ::= FileSize ModTime Checksum Mime Path
                                        --- A descriptor of file size, mime type, and path.
 FileSize     ::= uint64                --- The size of the corresponding file in octets.
 ModTime      ::= uint64                --- A unix-time timestamp denoting when the file was last modified.
@@ -205,24 +205,39 @@ This format is useful for storing raw bitmap data that can be directly memory-ma
 This format is for storing generic logging and event information.
 
 :: BNF
-Header    ::= StartTime
-Payload   ::= Entry*
-StartTime ::= uint64                        --- The number of seconds since the Unix epoch (1st of January 1970 UTC) at which this log begins.
-Entry     ::= Size Time Severity Source Category Message
-Size      ::= uint32                        --- The size of the remaining log entry in octets.
-Time      ::= uint64                        --- The number of milliseconds since StartTime at which this log entry was recorded.
-Severity  ::= int8                          --- The severity or importance of the log entry.
-Source    ::= uint8 string{uint8}           --- An identifier of the source of the log entry.
-Category  ::= uint8 string{uint8}           --- An identifier of the category the entry belongs to.
-Message   ::= string{remaining}             --- A human-readable message describing the event.
-remaining --- The remaining number of octets in the Entry. This can be obtained by subtracting the size of the Source, Category, Time, and Severity from the Size of the Entry.
+Header      ::= StartTime ChunkCount
+Payload     ::= Chunk*
+Chunk       ::= ChunkSize EntryCount EntryOffset{EntryCount} Entry{EntryCount}
+StartTime   ::= uint64                        --- The number of seconds since the Unix epoch (1st of January 1970 UTC) at which this log begins.
+Entry       ::= Size Time Severity Source Category Message
+Size        ::= uint32                        --- The size of the remaining log entry in octets.
+Time        ::= uint64                        --- The number of milliseconds since StartTime at which this log entry was recorded.
+Severity    ::= int8                          --- The severity or importance of the log entry.
+Source      ::= uint8 string{uint8}           --- An identifier of the source of the log entry.
+Category    ::= uint8 string{uint8}           --- An identifier of the category the entry belongs to.
+Message     ::= string{remaining}             --- A human-readable message describing the event.
+ChunkCount  ::= uint16                        --- The number of chunks in the file.
+ChunkSize   ::= uint64                        --- The octet size of the chunk.
+EntryCount  ::= uint32                        --- The number of entries in the chunk.
+EntryOffset ::= uint64                        --- The octet offset of the corresponding Entry from the beginning of Payload.
+remaining    --- The remaining number of octets in the Entry. This can be obtained by subtracting the size of the Source, Category, Time, and Severity from the Size of the Entry.
 ::
 
 The ``severity`` should be zero if the message is of neutral importance, positive for increasingly vital information, and negative for increasingly detailed information.
 
 Both the ``Source`` and ``Category`` may consist of just a null byte each if the information is not relevant.
 
-This file format is designed such that applications can append data directly to the file to create new log entries.
+The format is designed such that an application can continuously append new entries. To do so, it should behave as follows:
+
+1. Increase the ``ChunkCount``
+2. Append a new ``Chunk`` and allocate a number of ``EntryOffset``s within the chunk.
+3. When a new entry is generated and there are still unused ``EntryOffset``s:
+   1. Update the ``ChunkSize`` and ``EntryCount``
+   2. Fill in the current end offset into the corresponding ``EntryOffset``.
+   3. Append the new ``Entry``.
+4. Otherwise start from 1.
+
+The ``EntryOffset``s allow a reading application to scan through the log much more quickly, and perform a binary search to identify date ranges.
 
 ### Use-Case
 This format is useful for basic logging purposes in applications that run for a longer amount of time.The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
@@ -350,8 +365,7 @@ Line         ::= [ 01 ] Color Thickness ShapeOutline
 Rectangle    ::= [ 02 ] ShapeFill ShapeBounds    --- An axis-aligned rectangle.
 Circle       ::= [ 03 ] ShapeFill ShapeBounds    --- An axis-aligned oval circle.
 Polygon      ::= [ 04 ] ShapeFill ShapeOutline   --- A many-edged convex polygon.
-Curve        ::= [ 05 ] ShapeFill ControlPoints Point{Edges}
-                                                 --- A cubic Bezier curve directed by its control points.
+Curve        ::= [ 05 ] ShapeFill ShapeOutline   --- A cubic Bezier curve directed by its control points.
 Text         ::= [ 06 ] Color Point Font FontSize String
                                                  --- A single line of text.
 Font         ::= uint16 string{uint16}           --- The name of the font family to use to render the text.
@@ -376,7 +390,7 @@ When an element with a ``ShapeFill`` should be drawn, the fill must be drawn fir
 
 For ``Curve`` and ``Polygon``, if the ``Point``s do not form a closed shape, the fill should be drawn as a closed shape by directly connecting the first and last points with a straight line.
 
-In the case of the ``Curve``, the edges should be interpreted as follows: ``EdgePoint ControlPoint (ControlPoint EdgePoint ControlPoint)* ControlPoint EdgePoint``. As such, the ``Edges`` number for a ``Curve`` must always match ``4+3x``. Any other value is an error.
+In the case of the ``Curve``, the points should be interpreted as follows: ``EdgePoint ControlPoint (ControlPoint EdgePoint ControlPoint)* ControlPoint EdgePoint``. As such, the ``Edges`` number for a ``Curve`` must always match ``x+2 % 3 == 0`` and must at least be ``4``. Any other value is an error. The ``ControlPoint`` coordinates are relative to their corresponding ``EdgePoint``.
 
 In the case of ``Polygon`` and ``Rectangle``, the ``Edges`` number must be at least ``2``. Any other value is an error.
 
