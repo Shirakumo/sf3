@@ -215,12 +215,11 @@ Time        ::= uint64                        --- The number of milliseconds sin
 Severity    ::= int8                          --- The severity or importance of the log entry.
 Source      ::= uint8 string{uint8}           --- An identifier of the source of the log entry.
 Category    ::= uint8 string{uint8}           --- An identifier of the category the entry belongs to.
-Message     ::= string{remaining}             --- A human-readable message describing the event.
+Message     ::= string{uint16}                --- A human-readable message describing the event.
 ChunkCount  ::= uint16                        --- The number of chunks in the file.
 ChunkSize   ::= uint64                        --- The octet size of the chunk.
 EntryCount  ::= uint32                        --- The number of entries in the chunk.
 EntryOffset ::= uint64                        --- The octet offset of the corresponding Entry from the beginning of Payload.
-remaining    --- The remaining number of octets in the Entry. This can be obtained by subtracting the size of the Source, Category, Time, and Severity from the Size of the Entry.
 ::
 
 The ``severity`` should be zero if the message is of neutral importance, positive for increasingly vital information, and negative for increasingly detailed information.
