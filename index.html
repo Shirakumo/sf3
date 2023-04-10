@@ -40,17 +40,15 @@ Count        ::= uint64                --- The number of entries.
 MetadataSize ::= uint64                --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
 EntryOffset  ::= uint64                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
-MetaEntry    ::= FileSize ModTime Checksum Mime Path
-                                       --- A descriptor of file size, mime type, and path.
-FileSize     ::= uint64                --- The size of the corresponding file in octets.
+MetaEntry    ::= ModTime Checksum Mime Path
+                                       --- A descriptor of modification time, CRC checksum, mime type, and path.
 ModTime      ::= uint64                --- A unix-time timestamp denoting when the file was last modified.
 Mime         ::= uint8 string{uint8}   --- The mime-type of the corresponding file.
 Checksum     ::= uint32                --- A CRC32 checksum.
 Path         ::= uint16 string{uint16} --- The relative path of the corresponding file.
-Files        ::= FileOffset{Count+1} File{Count}
+Files        ::= FileOffset{Count} File{Count}
 FileOffset   ::= uint64                --- The octet offset of the corresponding File from the beginning of Files.
-File         ::= uint8{octetsize}      --- A binary file payload.
-octetsize    --- The size of the file, which is computed from FileOffset{n+1}-FileOffset{n}.</pre></code><p>The included <code>MetadataSize</code>, <code>EntryOffset</code>, and <code>FileOffset</code> fields should allow constant-time access to any content within the archive.<br>If no mime-type is known for a file that should be stored, the corresponding <code>Mime</code> should be set to <code>application/octet-stream</code>.</p><p>Each <code>EntryOffset</code> in <code>Metadata</code>, and each <code>FileOffset</code> in <code>Files</code> must be larger than the preceding entry.</p><h3 id="use-case">Use-Case</h3><p>This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.</p><h2 id="audio">Audio</h2><p>This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.</p><code style="display:block" class="code-block" data-language="BNF"><pre>Header     ::= Samplerate Channels format 
+File         ::= uint64 uint8{uint64}  --- A binary file payload.</pre></code><p>The included <code>MetadataSize</code>, <code>EntryOffset</code>, and <code>FileOffset</code> fields should allow constant-time access to any content within the archive.<br>If no mime-type is known for a file that should be stored, the corresponding <code>Mime</code> should be set to <code>application/octet-stream</code>.</p><p>Each <code>EntryOffset</code> in <code>Metadata</code>, and each <code>FileOffset</code> in <code>Files</code> must be larger than the preceding entry.</p><h3 id="use-case">Use-Case</h3><p>This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.</p><h2 id="audio">Audio</h2><p>This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.</p><code style="display:block" class="code-block" data-language="BNF"><pre>Header     ::= Samplerate Channels format 
 Payload    ::= sample{Channels}*
 Samplerate ::= uint32 --- The samplerate in Hz.
 Channels   ::= uint8  --- The number of audio channels.
