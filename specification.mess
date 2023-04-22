@@ -300,11 +300,12 @@ material-type  ::= uint8                   --- A single octet identifying the ma
 material-count ::= material-type:4         --- The number of material textures as indicated by material-type.
 vertex         ::= <format 03: Position
                         |  05: Position UV
-                        |  16: Position Color
-                        |  26: Position Normal
+                        |  06: Position Color
+                        |  16: Position Normal
                         |  08: Position UV Normal
-                        |  19: Position Color Normal
-                        |  0B: Position UV Normal Tangent>
+                        |  09: Position Color Normal
+                        |  0B: Position UV Normal Tangent
+                        |  0C: Position Color Normal Tangent>
                                             --- A single-vertex value in the format indicated by format.
 ::
 
