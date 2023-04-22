@@ -151,14 +151,14 @@ The length of the payload is unbounded, but must always be a multiple of ``Chann
 The values for ``channels`` are interpreted as follows, declaring the order and purpose of the channels:
 
 - ``1`` --- FC
-- ``2`` --- FL, FR
-- ``3`` --- FL, FR, FC
-- ``4`` --- FL, FR, RL, RR
-- ``5`` --- FL, FR, RL, RR, S
-- ``6`` --- FL, FR, FC, RL, RR, S
-- ``7`` --- FL, FR, FC, RL, RR, SL, SR
-- ``8`` --- FL, FR, FC, RL, RR, SL, SR, S
-- ``9`` --- FL, FR, FC, RL, RR, RC, SL, SR, S
+- ``2`` --- FL FR
+- ``3`` --- FL FR FC
+- ``4`` --- FL FR RL RR
+- ``5`` --- FL FR RL RR S
+- ``6`` --- FL FR FC RL RR S
+- ``7`` --- FL FR FC RL RR SL SR
+- ``8`` --- FL FR FC RL RR SL SR S
+- ``9`` --- FL FR FC RL RR RC SL SR S
 
 Where
 
