@@ -285,13 +285,13 @@ Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-spa
 format         ::= uint8                   --- A single octet identifying the per-vertex format.
 material-type  ::= uint8                   --- A single octet identifying the material used.
 material-count ::= material-type:4         --- The number of material textures as indicated by material-type.
-vertex         ::= <format 01: Position
-                        |  02: Position UV
-                        |  12: Position Color
-                        |  22: Position Normal
-                        |  03: Position UV Normal
-                        |  13: Position Color Normal
-                        |  04: Position UV Normal Tangent>
+vertex         ::= <format 03: Position
+                        |  05: Position UV
+                        |  16: Position Color
+                        |  26: Position Normal
+                        |  08: Position UV Normal
+                        |  19: Position Color Normal
+                        |  0B: Position UV Normal Tangent>
                                             --- A single-vertex value in the format indicated by format.
 ::
 
