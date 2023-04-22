@@ -209,15 +209,28 @@ channel       ::= <format 01: int8
 Any other value for ``format`` is invalid. 
 The values for ``channels`` are interpreted as follows:
 
-- ``01`` --- ``R``
-- ``02`` --- ``RA``
+- ``01`` --- ``K``
+- ``02`` --- ``KA``
 - ``03`` --- ``RGB``
 - ``04`` --- ``RGBA``
-- ``12`` --- ``AR``
+- ``12`` --- ``AK``
 - ``13`` --- ``BGR``
 - ``14`` --- ``ABGR``
 - ``24`` --- ``ARGB``
 - ``34`` --- ``BGRA``
+- ``44`` --- ``CMYK``
+- ``54`` --- ``KYMC``
+
+Where
+
+- ``K`` --- Black
+- ``R`` --- Red
+- ``G`` --- Green
+- ``B`` --- Blue
+- ``A`` --- Alpha
+- ``C`` --- Cyan
+- ``M`` --- Magenta
+- ``Y`` --- Yellow
 
 Any other value for ``channels`` is invalid.
 The payload must have exactly ``Width*Height*Depth*channel-count*format-bits`` number of bits.
