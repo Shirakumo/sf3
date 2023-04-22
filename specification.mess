@@ -282,14 +282,13 @@ This format is useful for basic logging purposes in applications that run for a 
 This format is for singular triangular meshes only. It does not include a scene graph or the capability for non-triangular or non-static meshes. If animation of the model is desired, animation information can be delivered separately.
 
 :: BNF
-Header         ::= format material-type MaterialSize Count
-Payload        ::= Material FaceIndices Vertices
+Header         ::= format material-type MaterialSize
+Payload        ::= Material Faces Vertices
 MaterialSize   ::= uint32                  --- The octet size of the Material payload.
-Count          ::= uint32                  --- The number of entries in the Faces array, must be a multiple of 3.
 Material       ::= Texture{material-count} --- An array of texture maps for the model's material.
 Texture        ::= uint16 string{uint16}   --- A relative file path to an image.
-FaceIndices    ::= uint32{Count}           --- An array of 0-based indices into the Vertices array, every 3 of which describe a face.
-Vertices       ::= vertex*
+Faces          ::= uint32 uint32{uint32}   --- An array of 0-based indices into the Vertices array, every 3 of which describe a face.
+Vertices       ::= uint32 float32{uint32}  --- An array of vertices, packed as floats. The count must be a multiple of the float count of an individual vertex.
 Position       ::= float32 float32 float32 --- A vertex position in model-space.
 UV             ::= float32 float32         --- A texture coordinate in texture-space.
 Color          ::= float32 float32 float32 --- An RGB colour triplet, each channel in [0,1].
@@ -298,14 +297,14 @@ Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-spa
 format         ::= uint8                   --- A single octet identifying the per-vertex format.
 material-type  ::= uint8                   --- A single octet identifying the material used.
 material-count ::= material-type:4         --- The number of material textures as indicated by material-type.
-vertex         ::= <format 03: Position
-                        |  05: Position UV
-                        |  06: Position Color
-                        |  16: Position Normal
-                        |  08: Position UV Normal
-                        |  09: Position Color Normal
-                        |  0B: Position UV Normal Tangent
-                        |  0C: Position Color Normal Tangent>
+vertex         ::= <format 01: Position
+                        |  02: Position UV
+                        |  12: Position Color
+                        |  22: Position Normal
+                        |  03: Position UV Normal
+                        |  13: Position Color Normal
+                        |  04: Position UV Normal Tangent
+                        |  14: Position Color Normal Tangent>
                                             --- A single-vertex value in the format indicated by format.
 ::
 
@@ -328,7 +327,7 @@ The values for ``material-type`` are interpreted as follows, and describe the us
 Any other value for ``material-type`` is invalid.
 The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively.
 
-The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. The number of ``vertex`` entries in the ``Vertices`` should be as high as the highest index in the ``Faces`` array, and must not exceed ``Count``. Similarly, each entry in the ``Faces`` array must be lower than ``Count``.
+The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. If the ``Faces`` array is empty, then the faces are implicit and every three vertices in the ``Vertices`` array form a face.
 
 ### Use-Case
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
