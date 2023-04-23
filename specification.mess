@@ -338,7 +338,7 @@ This format allows for a very simple rich text markup. Primitive displays can al
 :: BNF
 Header     ::= MarkupSize
 Payload    ::= uint32 Markup{uint32} uint64 string{uint64}
-MarkupSize ::= uint32                            --- The size of the markup block in octets
+MarkupSize ::= uint64                            --- The size of the markup block in octets
 Markup     ::= Start End Option                  --- A singular markup option
 Start      ::= uint64                            --- The starting (0-based) index of the region being styled.
 End        ::= uint64                            --- The end (exclusive) index of the region being styled.
