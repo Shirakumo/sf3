@@ -333,57 +333,34 @@ The included ``MaterialSize`` field should allow constant-time access to the ver
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
 
 ## Text
-The text format identifies the character encoding used, followed by the raw text payload. Essentially this means it is a regular "text file", but with a header that identifies the actual encoding used and thus liberates the need for encoding detecting kludges.
+This format allows for a very simple rich text markup. Primitive displays can also ignore all the markup directly and instead display the text plain without needing special processing to strip the markup out.
 
 :: BNF
-Header   ::= encoding
-Payload  ::= text
-encoding ::= uint8  --- A single octet identifying a text encoding.
-text     ::= uint8* --- A sequence of octets in the encoding described by the header.
+Header     ::= MarkupSize
+Payload    ::= uint32 Markup{uint32} uint64 string{uint64}
+MarkupSize ::= uint32                            --- The size of the markup block in octets
+Markup     ::= Start End Option                  --- A singular markup option
+Start      ::= uint64                            --- The starting (0-based) index of the region being styled.
+End        ::= uint64                            --- The end (exclusive) index of the region being styled.
+Option     ::= (Bold | Italic | Underline | Strike | Mono | Color | Size | Heading | Link)
+                                                 --- A description of the text style.
+Bold       ::= [ 01 ]                            --- The font weight should be set to "bold"
+Italic     ::= [ 02 ]                            --- The font slant should be set to "italic"
+Underline  ::= [ 03 ]                            --- A line should be drawn under the text's baseline.
+Strike     ::= [ 04 ]                            --- A line should be drawn between the text's baseline and ascent line.
+Mono       ::= [ 05 ]                            --- The font should be set to proportional / monospaced mode.
+Color      ::= [ 06 ] float32 float32 float32    --- The text colour should be set to this R G B triplet.
+Size       ::= [ 07 ] float32                    --- The text size should be multiplied by this factor.
+Heading    ::= [ 08 ] Level                      --- The text should be a heading of this level.
+Link       ::= [ 09 ] Target                     --- The text should be an interactable link to this target.
+Level      ::= uint8                             --- The heading level. The higher, the more deeply nested the heading is.
+Target     ::= uint16 string{uint16}             --- Some kind of target identifier. Often a URL string.
 ::
 
-The values for ``encoding`` are interpreted as follows:
-
-- ``00`` --- US-ASCII
-- ``01`` --- UTF-8
-- ``11`` --- UTF-16
-- ``21`` --- UTF-32
-- ``02`` --- ISO 8859-1
-- ``12`` --- ISO 8859-2
-- ``22`` --- ISO 8859-3
-- ``32`` --- ISO 8859-4
-- ``42`` --- ISO 8859-5
-- ``52`` --- ISO 8859-6
-- ``62`` --- ISO 8859-7
-- ``72`` --- ISO 8859-8
-- ``82`` --- ISO 8859-9
-- ``92`` --- ISO 8859-10
-- ``A2`` --- ISO 8859-11
-- ``B2`` --- ISO 8859-12
-- ``C2`` --- ISO 8859-13
-- ``D2`` --- ISO 8859-14
-- ``E2`` --- ISO 8859-15
-- ``F2`` --- ISO 8859-16
-- ``03`` --- Windows-874
-- ``13`` --- Windows-1250
-- ``23`` --- Windows-1251
-- ``33`` --- Windows-1252
-- ``43`` --- Windows-1253
-- ``53`` --- Windows-1254
-- ``63`` --- Windows-1255
-- ``73`` --- Windows-1256
-- ``04`` --- EUC-CN
-- ``14`` --- EUC-JP
-- ``24`` --- EUC-KR
-- ``34`` --- EUC-TW
-- ``05`` --- Shift JIS
-- ``15`` --- Big5
-- ``25`` --- GBK
-
-Any other value for the ``encoding`` is invalid.
+The font family, default font size, background color, foreground color, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option.
 
 ### Use-Case
-This format is useful for storing textual content without encoding ambiguities, making it possible to transfer text without having to pay the overhead that certain encodings can impose.
+This format is useful for storing simple rich text documents that don't require complex layouting or processing.
 
 ## Vector Graphic
 This format offers a relatively simple but capable vector graphic format for scalable images.
