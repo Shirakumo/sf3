@@ -352,12 +352,13 @@ Mono       ::= [ 05 ]                            --- The font should be set to p
 Color      ::= [ 06 ] float32 float32 float32    --- The text colour should be set to this R G B triplet.
 Size       ::= [ 07 ] float32                    --- The text size should be multiplied by this factor.
 Heading    ::= [ 08 ] Level                      --- The text should be a heading of this level.
-Link       ::= [ 09 ] Target                     --- The text should be an interactable link to this target.
+Link       ::= [ 09 ] Address                    --- The text should be an interactable link to its address.
+Target     ::= [ 10 ] Address                    --- The text should be a link target for its address.
 Level      ::= uint8                             --- The heading level. The higher, the more deeply nested the heading is.
-Target     ::= uint16 string{uint16}             --- Some kind of target identifier. Often a URL string.
+Address    ::= uint16 string{uint16}             --- Some kind of target identifier. Often a URL string.
 ::
 
-The font family, default font size, background color, foreground color, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option.
+The font family, default font size, background color, foreground color, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option. If the ``Address`` of a ``Link`` is the same as that of a ``Target`` option, the ``Link`` markup should, when interacted with, point the user to the text marked up by the corresponding ``Target`` option. Otherwise the behaviour of interaction with the ``Link`` text is up to the implementation.
 
 ### Use-Case
 This format is useful for storing simple rich text documents that don't require complex layouting or processing.
