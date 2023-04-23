@@ -126,27 +126,27 @@ This format is useful if you need a way to bundle files together into a single p
 This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.
 
 :: BNF
-Header     ::= Samplerate Channels format 
-Payload    ::= sample{Channels}*
-Samplerate ::= uint32 --- The samplerate in Hz.
-Channels   ::= uint8  --- The number of audio channels.
-format     ::= uint8  --- A single octet identifying the per-sample data type.
-sample     ::= <format 01: int8
-                     | 02: int16
-                     | 04: int32
-                     | 08: int64
-                     | 11: uint8
-                     | 12: uint16
-                     | 14: uint32
-                     | 18: uint64
-                     | 22: float16
-                     | 24: float32
-                     | 28: float64>
-                          ---  A single-channel value in the format indicated by format.
+Header      ::= Samplerate Channels Format FrameCount
+Payload     ::= sample{Channels}{FrameCount}
+Samplerate  ::= uint32 --- The samplerate in Hz.
+Channels    ::= uint8  --- The number of audio channels.
+Format      ::= uint8  --- A single octet identifying the per-sample data type.
+FrameCount  ::= uint64 --- The number of audio frames in the file.
+sample      ::= <Format 01: int8
+                      | 02: int16
+                      | 04: int32
+                      | 08: int64
+                      | 11: uint8
+                      | 12: uint16
+                      | 14: uint32
+                      | 18: uint64
+                      | 22: float16
+                      | 24: float32
+                      | 28: float64>
+                       ---  A single-channel value in the format indicated by format.
 ::
 
-Any other value for ``format`` is invalid. 
-The length of the payload is unbounded, but must always be a multiple of ``Channels*format-bits`` number of bits. For a finite file it can be figured out by subtracting the header size from the file size. If the ``format`` is ``01``, then the samples are stored according to the "A-law" non-linear scheme. Otherwise the samples are linear.
+Any other value for ``format`` is invalid. If the ``format`` is ``01``, then the samples are stored according to the "A-law" non-linear scheme. Otherwise the samples are linear.
 
 The values for ``channels`` are interpreted as follows, declaring the order and purpose of the channels:
 
