@@ -83,13 +83,13 @@ The rationale for the ten octets in the identifier is as follows:
 The ``Header`` and ``Payload`` will be described by the individual formats.
 The values for the ``format-id`` are interpreted as follows:
 
-- ``00`` --- Text
-- ``01`` --- Image
+- ``01`` --- Archive
 - ``02`` --- Audio
-- ``03`` --- Model
-- ``04`` --- Archive
-- ``05`` --- Log
-- ``06`` --- Vector Graphic
+- ``03`` --- Image
+- ``04`` --- Log
+- ``05`` --- Model
+- ``06`` --- Text
+- ``07`` --- Vector Graphic
 
 Any other value for the ``format-id`` is reserved for future formats in this spec. If an implementation only supports a subset of these formats, it must generate an error when it encounters a ``format-id`` that it does not support.
 
