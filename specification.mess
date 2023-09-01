@@ -88,8 +88,9 @@ The values for the ``format-id`` are interpreted as follows:
 - ``03`` --- Image
 - ``04`` --- Log
 - ``05`` --- Model
-- ``06`` --- Text
-- ``07`` --- Vector Graphic
+- ``06`` --- Physics-Model
+- ``07`` --- Text
+- ``08`` --- Vector Graphic
 
 Any other value for the ``format-id`` is reserved for future formats in this spec. If an implementation only supports a subset of these formats, it must generate an error when it encounters a ``format-id`` that it does not support.
 
@@ -331,6 +332,25 @@ The included ``MaterialSize`` field should allow constant-time access to the ver
 
 ### Use-Case
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
+
+## Physics-Model
+This format is for storing a series of convex meshes that make up the collision shapes of a more complex model. It is far more efficient at storing this data than the generic model format and allows multiple shapes in one.
+
+:: BNF
+Header       ::= format hull-count
+Payload      ::= mass Tensor Hull{hull-count}
+Tensor       ::= float32{9}              --- The inertia tensor for the entire model, in row-major order.
+Hull         ::= Transform vertex-count Vertex{vertex-count}
+                                         --- A single convex hull.
+Transform    ::= float32{16}             --- The transform matrix describing the offset and orientation of this hull from the model's origin, in row-major order.
+Vertex       ::= float32 float32 float32 --- A single vertex on the convex hull's surface.
+hull-count   ::= uint16                  --- The number of convex hulls that make up the model.
+vertex-count ::= uint16                  --- The number of vertices that make up the hull's boundary.
+mass         ::= float32                 --- The initial mass of the unscaled model in kg.
+::
+
+### Use-Case
+This format is intended for use in games and other applications that require a convex decomposition of a model for use in collision testing. The packed storage format is ideal for direct use in-engine.
 
 ## Text
 This format allows for a very simple rich text markup. Primitive displays can also ignore all the markup directly and instead display the text plain without needing special processing to strip the markup out.
