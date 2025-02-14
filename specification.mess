@@ -125,7 +125,7 @@ Each ``EntryOffset`` in ``Metadata``, and each ``FileOffset`` in ``Files`` must 
 This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.
 
 ## Audio
-This format is for storing plain audio sample data. It includes support for all types of sample formats and channel numbers out there. Unlike other formats, it also enforces the channel data to be interleaved rather than sequential, which foregoes the need for a length field, allowing the file to be written on the fly.
+This format is for storing plain audio sample data. It includes support for most types of sample formats and channel numbers out there. The sample channels are interleaved, allowing the file to be written on the fly.
 
 :: BNF
 Header      ::= Samplerate Channels Format FrameCount
