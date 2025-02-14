@@ -4,6 +4,20 @@
     <meta charset="utf-8">
     <title>SF3 Specification</title>
     <link rel="stylesheet" href="style.css"/>
+    
+    <meta name="viewport" content="width=device-width">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="SF3 Specification">
+    <meta name="twitter:description" content="SF3 - The Simple File Format Family is a specification of a number of simple binary file formats.">
+    <meta name="twitter:image" content="https://shirakumo.org/card.png">
+    <meta name="twitter:image:alt" content="">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SF3 Specification">
+    <meta property="og:description" content="SF3 - The Simple File Format Family is a specification of a number of simple binary file formats.">
+    <meta property="og:url" content="https://shirakumo.org/docs/sf3">
+    <meta property="og:image" content="https://shirakumo.org/docs/sf3/card.png">
   </head>
   <body>
     <div class="alert">

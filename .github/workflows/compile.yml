@@ -14,7 +14,7 @@ jobs:
           output: /tmp/markless/
       - shell: bash
         run: |
-          cp style.css /tmp/markless/
+          cp style.css card.png /tmp/markless/
           sed -e '/<main>/{r /tmp/markless/specification.html' -e 'd}' template.ctml > /tmp/markless/index.html
       - name: Upload Github Pages Artefact
         uses: actions/upload-pages-artifact@v3.0.1
