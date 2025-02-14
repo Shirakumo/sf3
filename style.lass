@@ -15,8 +15,8 @@
  :padding 1em)
 (.code-block
  :font-family monospace
+ :font-size 0.9em
  :padding 1em
  :background (hex F8F8F8)
- (pre :white-space pre-wrap
-      :overflow-x auto))
+ (pre :overflow-x auto))
 (li>p :margin 0)

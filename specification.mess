@@ -1,3 +1,4 @@
+; -*- mode markless-mode; fill-column: 60; -*-
 # About SF3
 SF3 (Simple File Format Family) is a family of file format specifications. These file formats all follow a similar scheme and the same principles.
 
@@ -37,9 +38,21 @@ Definition   ::= Rule Identifier? Description? '\n'
 Identifier   ::= '::=' Sequence
 Description  ::= '---' text
 Sequence     ::= Composition (' ' Composition)*
-Composition  ::= (Rule | OctetArray | Octet | Type | Switch | BitRange | '(' Sequence ')') (OneOrMore | AnyNumber | ExactNumber)?
+Composition  ::= Composable Counter?
+Composable   ::= Rule
+               | OctetArray
+               | Octet
+               | Type
+               | Switch
+               | BitRange
+               | '(' Sequence ')'
+Counter      ::= OneOrMore
+               | AnyNumber
+               | ExactNumber
 OctetArray   ::= '[' octet (' ' octet)* ']'
-Type         ::= ('int' | 'uint') IntBittage | 'float' FloatBittage | 'string' ExactNumber
+Type         ::= ('int' | 'uint') IntBittage
+               | 'float' FloatBittage
+               | 'string' ExactNumber
 IntBittage   ::= '8' | '16' | '24' | '32' | '64'
 FloatBittage ::= '16' | '32' | '64'
 Rule         ::= name
@@ -50,16 +63,19 @@ Switch       ::= '<' Rule SwitchCase ('|' SwitchCase)* '>'
 SwitchCase   ::= octet+ ':' Sequence
 BitRange     ::= Rule ':' (mask ',')? mask
 
-name         --- The name of a rule as a sequence of non-numeric ASCII characters.
-octet        --- Eight bits expressed as two hexadecimal digits.
-text         --- Human-readable textual description of the contents.
-number       --- A textual description of the number of occurrences. Can make a reference to other rules, in which case the rule's content designates a runtime number.
-mask         --- A textual description of the number of bits to use.
+name     --- The name of a rule as a sequence of non-numeric ASCII
+             characters.
+octet    --- Eight bits expressed as two hexadecimal digits.
+text     --- Human-readable textual description of the contents.
+number   --- A textual description of the number of occurrences. Can
+             make a reference to other rules, in which case the rule's
+             content designates a runtime number.
+mask     --- A textual description of the number of bits to use.
 ::
 
 White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a UTF-8 encoded character sequence with an octet length as indicated by the required following ``ExactNumber`` rule.
 
-A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``. 
+A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``.
 
 A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x:2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
 
@@ -101,19 +117,32 @@ The Archive format allows storing multiple files in one binary package. The file
 :: BNF
 Header       ::= Count MetadataSize
 Payload      ::= Metadata Files
-Count        ::= uint64                --- The number of entries.
-MetadataSize ::= uint64                --- The octet size of the Metadata payload.
+Count        ::= uint64
+             --- The number of entries.
+MetadataSize ::= uint64
+             --- The octet size of the Metadata payload.
 Metadata     ::= EntryOffset{Count} MetaEntry{Count}
-EntryOffset  ::= uint64                --- The octet offset of the corresponding MetaEntry from the beginning of Metadata.
+EntryOffset  ::= uint64
+             --- The octet offset of the corresponding MetaEntry from
+                 the beginning of Metadata.
 MetaEntry    ::= ModTime Checksum Mime Path
-                                       --- A descriptor of modification time, CRC checksum, mime type, and path.
-ModTime      ::= uint64                --- A unix-time timestamp denoting when the file was last modified.
-Mime         ::= uint8 string{uint8}   --- The mime-type of the corresponding file.
-Checksum     ::= uint32                --- A CRC32 checksum.
-Path         ::= uint16 string{uint16} --- The relative path of the corresponding file.
+             --- A descriptor of modification time, CRC checksum, mime
+                 type, and path.
+ModTime      ::= uint64
+             --- A unix-time timestamp denoting when the file was last
+                 modified.
+Mime         ::= uint8 string{uint8}
+             --- The mime-type of the corresponding file.
+Checksum     ::= uint32
+             --- A CRC32 checksum.
+Path         ::= uint16 string{uint16}
+             --- The relative path of the corresponding file.
 Files        ::= FileOffset{Count} File{Count}
-FileOffset   ::= uint64                --- The octet offset of the corresponding File from the beginning of Files.
-File         ::= uint64 uint8{uint64}  --- A binary file payload.
+FileOffset   ::= uint64
+             --- The octet offset of the corresponding File from the
+                 beginning of Files.
+File         ::= uint64 uint8{uint64}
+             --- A binary file payload.
 ::
 
 The included ``MetadataSize``, ``EntryOffset``, and ``FileOffset`` fields should allow constant-time access to any content within the archive.
@@ -130,10 +159,14 @@ This format is for storing plain audio sample data. It includes support for most
 :: BNF
 Header      ::= Samplerate Channels Format FrameCount
 Payload     ::= sample{Channels}{FrameCount}
-Samplerate  ::= uint32 --- The samplerate in Hz.
-Channels    ::= uint8  --- The number of audio channels.
-Format      ::= uint8  --- A single octet identifying the per-sample data type.
-FrameCount  ::= uint64 --- The number of audio frames in the file.
+Samplerate  ::= uint32
+            --- The samplerate in Hz.
+Channels    ::= uint8
+            --- The number of audio channels.
+Format      ::= uint8
+            --- A single octet identifying the per-sample data type.
+FrameCount  ::= uint64
+            --- The number of audio frames in the file.
 sample      ::= <Format 01: int8
                       | 02: int16
                       | 04: int32
@@ -145,7 +178,8 @@ sample      ::= <Format 01: int8
                       | 22: float16
                       | 24: float32
                       | 28: float64>
-                       ---  A single-channel value in the format indicated by format.
+            ---  A single-channel value in the format indicated
+                 by format.
 ::
 
 Any other value for ``format`` is invalid. If the ``format`` is ``01``, then the samples are stored according to the "A-law" non-linear scheme. Otherwise the samples are linear.
@@ -191,9 +225,14 @@ Color         ::= channel{channel-count}
 Width         ::= uint32
 Height        ::= uint32
 Depth         ::= uint32
-format        ::= uint8      --- A single octet identifying the per-channel data type.
-channels      ::= uint8      --- A single octet identifying the number and order of channels.
-channel-count ::= channels:4 --- The number of channels indicated by the lower 4 bits of the channels.
+format        ::= uint8
+              --- A single octet identifying the per-channel data type.
+channels      ::= uint8
+              --- A single octet identifying the number and order of
+                  channels.
+channel-count ::= channels:4
+              --- The number of channels indicated by the lower 4 bits
+                  of the channels.
 channel       ::= <format 01: int8
                         | 02: int16
                         | 04: int32
@@ -205,10 +244,11 @@ channel       ::= <format 01: int8
                         | 22: float16
                         | 24: float32
                         | 28: float64>
-                             ---  A single-channel colour value in the format indicated by format.
+              ---  A single-channel colour value in the format
+                   indicated by format.
 ::
 
-Any other value for ``format`` is invalid. 
+Any other value for ``format`` is invalid.
 The values for ``channels`` are interpreted as follows:
 
 - ``01`` --- ``K``
@@ -247,18 +287,32 @@ This format is for storing generic logging and event information.
 Header      ::= StartTime ChunkCount
 Payload     ::= Chunk*
 Chunk       ::= ChunkSize EntryCount EntryOffset{EntryCount} Entry{EntryCount}
-StartTime   ::= uint64                        --- The number of seconds since the Unix epoch (1st of January 1970 UTC) at which this log begins.
+StartTime   ::= uint64
+            --- A unix-time timestamp specifying when this file
+                begins.
 Entry       ::= Size Time Severity Source Category Message
-Size        ::= uint32                        --- The size of the remaining log entry in octets.
-Time        ::= uint64                        --- The number of milliseconds since StartTime at which this log entry was recorded.
-Severity    ::= int8                          --- The severity or importance of the log entry.
-Source      ::= uint8 string{uint8}           --- An identifier of the source of the log entry.
-Category    ::= uint8 string{uint8}           --- An identifier of the category the entry belongs to.
-Message     ::= uint16 string{uint16}         --- A human-readable message describing the event.
-ChunkCount  ::= uint16                        --- The number of chunks in the file.
-ChunkSize   ::= uint64                        --- The octet size of the chunk.
-EntryCount  ::= uint32                        --- The number of entries in the chunk.
-EntryOffset ::= uint64                        --- The octet offset of the corresponding Entry from the beginning of Payload.
+Size        ::= uint32
+            --- The size of the remaining log entry in octets.
+Time        ::= uint64
+            --- The number of milliseconds since StartTime at which
+                this log entry was recorded.
+Severity    ::= int8
+            --- The severity or importance of the log entry.
+Source      ::= uint8 string{uint8}
+            --- An identifier of the source of the log entry.
+Category    ::= uint8 string{uint8}
+            --- An identifier of the category the entry belongs to.
+Message     ::= uint16 string{uint16}
+            --- A human-readable message describing the event.
+ChunkCount  ::= uint16
+            --- The number of chunks in the file.
+ChunkSize   ::= uint64
+            --- The octet size of the chunk.
+EntryCount  ::= uint32
+            --- The number of entries in the chunk.
+EntryOffset ::= uint64
+            --- The octet offset of the corresponding Entry from the
+                beginning of Payload.
 ::
 
 The ``severity`` should be zero if the message is of neutral importance, positive for increasingly vital information, and negative for increasingly detailed information.
@@ -286,19 +340,36 @@ This format is for singular triangular meshes only. It does not include a scene 
 :: BNF
 Header         ::= format material-type MaterialSize
 Payload        ::= Material Faces Vertices
-MaterialSize   ::= uint32                  --- The octet size of the Material payload.
-Material       ::= Texture{material-count} --- An array of texture maps for the model's material.
-Texture        ::= uint16 string{uint16}   --- A relative file path to an image.
-Faces          ::= uint32 uint32{uint32}   --- An array of 0-based indices into the Vertices array, every 3 of which describe a face.
-Vertices       ::= uint32 float32{uint32}  --- An array of vertices, packed as floats. The count must be a multiple of the float count of an individual vertex.
-Position       ::= float32 float32 float32 --- A vertex position in model-space.
-UV             ::= float32 float32         --- A texture coordinate in texture-space.
-Color          ::= float32 float32 float32 --- An RGB colour triplet, each channel in [0,1].
-Normal         ::= float32 float32 float32 --- A surface normal, in tangent-space.
-Tangent        ::= float32 float32 float32 --- A surface tangent, in tangent-space.
-format         ::= uint8                   --- A single octet identifying the per-vertex format.
-material-type  ::= uint8                   --- A single octet identifying the material used.
-material-count ::= material-type:4         --- The number of material textures as indicated by material-type.
+MaterialSize   ::= uint32
+               --- The octet size of the Material payload.
+Material       ::= Texture{material-count}
+               --- An array of texture maps for the model's material.
+Texture        ::= uint16 string{uint16}
+               --- A relative file path to an image.
+Faces          ::= uint32 uint32{uint32}
+               --- An array of 0-based indices into the Vertices
+                   array, every 3 of which describe a face.
+Vertices       ::= uint32 float32{uint32}
+               --- An array of vertices, packed as floats. The count
+                   must be a multiple of the float count of an
+                   individual vertex.
+Position       ::= float32 float32 float32
+               --- A vertex position in model-space.
+UV             ::= float32 float32
+               --- A texture coordinate in texture-space.
+Color          ::= float32 float32 float32
+               --- An RGB colour triplet, each channel in [0,1].
+Normal         ::= float32 float32 float32
+               --- A surface normal, in tangent-space.
+Tangent        ::= float32 float32 float32
+               --- A surface tangent, in tangent-space.
+format         ::= uint8
+               --- A single octet identifying the per-vertex format.
+material-type  ::= uint8
+               --- A single octet identifying the material used.
+material-count ::= material-type:4
+               --- The number of material textures as indicated by
+                   material-type.
 vertex         ::= <format 01: Position
                         |  02: Position UV
                         |  12: Position Color
@@ -307,7 +378,8 @@ vertex         ::= <format 01: Position
                         |  13: Position Color Normal
                         |  04: Position UV Normal Tangent
                         |  14: Position Color Normal Tangent>
-                                            --- A single-vertex value in the format indicated by format.
+               --- A single-vertex value in the format indicated by
+                   format.
 ::
 
 The values for ``material-type`` are interpreted as follows, and describe the usage and number of ``Texture``s:
@@ -340,23 +412,37 @@ This format is for storing a series of convex meshes that make up the collision 
 :: BNF
 Header       ::= format hull-count
 Payload      ::= mass Tensor shape-count Shape{shape-count}
-Tensor       ::= float32{9}              --- The inertia tensor for the entire model, in row-major order.
+Tensor       ::= float32{9}
+             --- The inertia tensor for the entire model, in row-major
+                 order.
 Shape        ::= Transform (Ellipsoid | Box | Cylinder | Pill | TriMesh)
 Ellipsoid    ::= [ 01 ] float32 float32 float32
-                                         --- The width, height, and depth of the ellipsoid measured from its centre.
+             --- The width, height, and depth of the ellipsoid
+                 measured from its centre.
 Box          ::= [ 02 ] float32 float32 float32
-                                         --- The width, height, and depth of the box measured from its centre.
+             --- The width, height, and depth of the box measured from
+                 its centre.
 Cylinder     ::= [ 03 ] float32 float32 float32
-                                         --- The bottom radius, top radius, and height of the cylinder measured from its centre.
+             --- The bottom radius, top radius, and height of the
+                 cylinder measured from its centre.
 Pill         ::= [ 04 ] float32 float32 float32
-                                         --- The bottom radius, top radius, and height of the cylinder measured from its centre.
+             --- The bottom radius, top radius, and height of the
+                 cylinder measured from its centre.
 TriMesh      ::= [ 05 ] vertex-count Vertex{vertex-count}
-                                         --- A single convex hull triangular mesh
-Transform    ::= float32{16}             --- The transform matrix describing the offset and orientation of this hull from the model's origin, in row-major order.
-Vertex       ::= float32 float32 float32 --- A single vertex on the convex hull's surface.
-shape-count  ::= uint16                  --- The number of shapes that make up the model.
-vertex-count ::= uint16                  --- The number of vertices that make up the hull's boundary.
-mass         ::= float32                 --- The initial mass of the unscaled model in kg.
+             --- A single convex hull triangular mesh
+Transform    ::= float32{16}
+             --- The transform matrix describing the offset and
+                 orientation of this hull from the model's origin, in
+                 row-major order.
+Vertex       ::= float32 float32 float32
+             --- A single vertex on the convex hull's surface.
+shape-count  ::= uint16
+             --- The number of shapes that make up the model.
+vertex-count ::= uint16
+             --- The number of vertices that make up the hull's
+                 boundary.
+mass         ::= float32
+             --- The initial mass of the unscaled model in kg.
 ::
 
 Each of the implicit shapes (ellipsoid, box, cylinder, pill) are specified with the origin being the shape's centre, and the three values, width, height, and depth, being in X, Y, and Z directions respectively from that centre. Meaning: a cube specified as Width 1, Height 2, Depth 3 has a volume of 48, since each dimension only specifies the half of that side's length.
@@ -372,24 +458,52 @@ This format allows for a very simple rich text markup. Primitive displays can al
 :: BNF
 Header     ::= MarkupSize
 Payload    ::= uint32 Markup{uint32} uint64 string{uint64}
-MarkupSize ::= uint64                            --- The size of the markup block in octets
-Markup     ::= Start End Option                  --- A singular markup option
-Start      ::= uint64                            --- The starting (0-based) index of the region being styled.
-End        ::= uint64                            --- The end (exclusive) index of the region being styled.
-Option     ::= (Bold | Italic | Underline | Strike | Mono | Color | Size | Heading | Link)
-                                                 --- A description of the text style.
-Bold       ::= [ 01 ]                            --- The font weight should be set to "bold"
-Italic     ::= [ 02 ]                            --- The font slant should be set to "italic"
-Underline  ::= [ 03 ]                            --- A line should be drawn under the text's baseline.
-Strike     ::= [ 04 ]                            --- A line should be drawn between the text's baseline and ascent line.
-Mono       ::= [ 05 ]                            --- The font should be set to proportional / monospaced mode.
-Color      ::= [ 06 ] float32 float32 float32    --- The text colour should be set to this R G B triplet.
-Size       ::= [ 07 ] float32                    --- The text size should be multiplied by this factor.
-Heading    ::= [ 08 ] Level                      --- The text should be a heading of this level.
-Link       ::= [ 09 ] Address                    --- The text should be an interactable link to its address.
-Target     ::= [ 0A ] Address                    --- The text should be a link target for its address.
-Level      ::= uint8                             --- The heading level. The higher, the more deeply nested the heading is.
-Address    ::= uint16 string{uint16}             --- Some kind of target identifier. Often a URL string.
+MarkupSize ::= uint64
+           --- The size of the markup block in octets
+Markup     ::= Start End Option
+           --- A singular markup option
+Start      ::= uint64
+           --- The starting (0-based) index of the region being
+               styled.
+End        ::= uint64
+           --- The end (exclusive) index of the region being styled.
+Option     ::= Bold
+             | Italic
+             | Underline
+             | Strike
+             | Mono
+             | Color
+             | Size
+             | Heading
+             | Link
+           --- A description of the text style.
+Bold       ::= [ 01 ]
+           --- The font weight should be set to "bold"
+Italic     ::= [ 02 ]
+           --- The font slant should be set to "italic"
+Underline  ::= [ 03 ]
+           --- A line should be drawn under the text's baseline.
+Strike     ::= [ 04 ]
+           --- A line should be drawn between the text's baseline and
+               ascent line.
+Mono       ::= [ 05 ]
+           --- The font should be set to proportional / monospaced
+               mode.
+Color      ::= [ 06 ] float32 float32 float32
+           --- The text colour should be set to this R G B triplet.
+Size       ::= [ 07 ] float32
+           --- The text size should be multiplied by this factor.
+Heading    ::= [ 08 ] Level
+           --- The text should be a heading of this level.
+Link       ::= [ 09 ] Address
+           --- The text should be an interactable link to its address.
+Target     ::= [ 0A ] Address
+           --- The text should be a link target for its address.
+Level      ::= uint8
+           --- The heading level. The higher, the more deeply nested
+               the heading is.
+Address    ::= uint16 string{uint16}
+           --- Some kind of target identifier. Often a URL string.
 ::
 
 The font family, default font size, background color, foreground color, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option. If the ``Address`` of a ``Link`` is the same as that of a ``Target`` option, the ``Link`` markup should, when interacted with, point the user to the text marked up by the corresponding ``Target`` option. Otherwise the behaviour of interaction with the ``Link`` text is up to the implementation.
@@ -403,33 +517,58 @@ This format offers a relatively simple but capable vector graphic format for sca
 :: BNF
 Header       ::= Width Height Count
 Payload      ::= Instruction{Count}
-Width        ::= uint32                          --- The width of the visible canvas in units.
-Height       ::= uint32                          --- The height of the visible canvas in units.
-Count        ::= uint32                          --- The number of instructions to appear.
+Width        ::= uint32
+             --- The width of the visible canvas in units.
+Height       ::= uint32
+             --- The height of the visible canvas in units.
+Count        ::= uint32
+             --- The number of instructions to appear.
 Instruction  ::= Element | Transform
 Element      ::= Line | Rectangle | Circle | Polygon | Curve
 Line         ::= [ 01 ] Color Thickness ShapeOutline
-                                                 --- A sequence of connected line segments.
-Rectangle    ::= [ 02 ] ShapeFill ShapeBounds    --- An axis-aligned rectangle.
-Circle       ::= [ 03 ] ShapeFill ShapeBounds    --- An axis-aligned oval circle.
-Polygon      ::= [ 04 ] ShapeFill ShapeOutline   --- A many-edged convex polygon.
-Curve        ::= [ 05 ] ShapeFill ShapeOutline   --- A cubic Bezier curve directed by its control points.
+
+             --- A sequence of connected line segments.
+Rectangle    ::= [ 02 ] ShapeFill ShapeBounds
+             --- An axis-aligned rectangle.
+Circle       ::= [ 03 ] ShapeFill ShapeBounds
+             --- An axis-aligned oval circle.
+Polygon      ::= [ 04 ] ShapeFill ShapeOutline
+             --- A many-edged convex polygon.
+Curve        ::= [ 05 ] ShapeFill ShapeOutline
+             --- A cubic Bezier curve directed by its control points.
 Text         ::= [ 06 ] Color Point Font FontSize String
-                                                 --- A single line of text.
-Font         ::= uint16 string{uint16}           --- The name of the font family to use to render the text.
-String       ::= uint16 string{uint16}           --- The string of text to be displayed
+
+             --- A single line of text.
+Font         ::= uint16 string{uint16}
+             --- The name of the font family to use to render the
+                 text.
+String       ::= uint16 string{uint16}
+             --- The string of text to be displayed
 Transform    ::= Identity | Matrix
-Identity     ::= [ 11 ]                          --- A reset of the current transform matrix to the 1 0 0, 0 1 0 matrix.
-Matrix       ::= [ 12 ] float32{6}               --- A coordinate transform matrix to be applied to subsequent instructions.
-ShapeOutline ::= Edges Point{Edges}              --- A list of edge points of a composite shape.
-ShapeBounds  ::= Point Size                      --- The bounding box of a shape.
-ShapeFill    ::= Color Color Thickness           --- The fill color, outline color, and outline thickness.
-Point        ::= float32 float32                 --- A position in x/y.
-Size         ::= float32 float32                 --- The bounding size of a shape in width/height.
-Color        ::= float32 float32 float32 float32 --- An RGBA colour quadruplet in the range of [0, 1].
-Edges        ::= uint16                          --- The number of points to appear in the edge list.
-Thickness    ::= float32                         --- The thickness of the outline in units.
-FontSize     ::= float32                         --- The size of an em in units.
+Identity     ::= [ 11 ]
+             --- A reset of the current transform matrix to the
+                 1 0 0, 0 1 0 matrix.
+Matrix       ::= [ 12 ] float32{6}
+             --- A coordinate transform matrix to be applied to
+                 subsequent instructions.
+ShapeOutline ::= Edges Point{Edges}
+             --- A list of edge points of a composite shape.
+ShapeBounds  ::= Point Size
+             --- The bounding box of a shape.
+ShapeFill    ::= Color Color Thickness
+             --- The fill color, outline color, and outline thickness.
+Point        ::= float32 float32
+             --- A position in x/y.
+Size         ::= float32 float32
+             --- The bounding size of a shape in width/height.
+Color        ::= float32 float32 float32 float32
+             --- An RGBA colour quadruplet in the range of [0, 1].
+Edges        ::= uint16
+             --- The number of points to appear in the edge list.
+Thickness    ::= float32
+             --- The thickness of the outline in units.
+FontSize     ::= float32
+             --- The size of an em in units.
 ::
 
 The coordinate system should be defined with X growing to the right, Y growing upwards, and the origin being in the lower left corner of the canvas. Whenever a ``Transform`` is applied, the given matrix must be applied to all following ``Element``s until the next ``Transform``. This transformation applies to the shape as a whole, not just the ``Point``s that define it in the file.
