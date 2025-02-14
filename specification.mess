@@ -64,7 +64,7 @@ A ``Switch`` acts as a runtime switching based on the value of the referenced ``
 A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x:2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
 
 # Formats
-Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Payload`` is structured to always take up 16 octets.
+Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Payload`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
 
 :: BNF
 File       ::= Identifier Header Payload
@@ -339,16 +339,29 @@ This format is for storing a series of convex meshes that make up the collision 
 
 :: BNF
 Header       ::= format hull-count
-Payload      ::= mass Tensor Hull{hull-count}
+Payload      ::= mass Tensor shape-count Shape{shape-count}
 Tensor       ::= float32{9}              --- The inertia tensor for the entire model, in row-major order.
-Hull         ::= Transform vertex-count Vertex{vertex-count}
-                                         --- A single convex hull.
+Shape        ::= Transform (Ellipsoid | Box | Cylinder | Pill | TriMesh)
+Ellipsoid    ::= [ 01 ] float32 float32 float32
+                                         --- The width, height, and depth of the ellipsoid measured from its centre.
+Box          ::= [ 02 ] float32 float32 float32
+                                         --- The width, height, and depth of the box measured from its centre.
+Cylinder     ::= [ 03 ] float32 float32 float32
+                                         --- The bottom radius, top radius, and height of the cylinder measured from its centre.
+Pill         ::= [ 04 ] float32 float32 float32
+                                         --- The bottom radius, top radius, and height of the cylinder measured from its centre.
+TriMesh      ::= [ 05 ] vertex-count Vertex{vertex-count}
+                                         --- A single convex hull triangular mesh
 Transform    ::= float32{16}             --- The transform matrix describing the offset and orientation of this hull from the model's origin, in row-major order.
 Vertex       ::= float32 float32 float32 --- A single vertex on the convex hull's surface.
-hull-count   ::= uint16                  --- The number of convex hulls that make up the model.
+shape-count  ::= uint16                  --- The number of shapes that make up the model.
 vertex-count ::= uint16                  --- The number of vertices that make up the hull's boundary.
 mass         ::= float32                 --- The initial mass of the unscaled model in kg.
 ::
+
+Each of the implicit shapes (ellipsoid, box, cylinder, pill) are specified with the origin being the shape's centre, and the three values, width, height, and depth, being in X, Y, and Z directions respectively from that centre. Meaning: a cube specified as Width 1, Height 2, Depth 3 has a volume of 48, since each dimension only specifies the half of that side's length.
+
+For the cylinder and pill specifically the shapes are oriented Y-up. Meaning: a cylinder's flat sides are oriented Y- and Y+. For the pill the centres of the spheres at its ends are apart from each other by 2*height. If 2*height of the pill is less than the combined radii of both spheres, the collision behaviour is implementation dependent as the shape is no longer well defined.
 
 ### Use-Case
 This format is intended for use in games and other applications that require a convex decomposition of a model for use in collision testing. The packed storage format is ideal for direct use in-engine.
