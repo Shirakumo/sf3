@@ -464,6 +464,7 @@ The mime-types for SF3 files should be as follows, according to the format used:
 - **Image** ``image/x.sf3``
 - **Log** ``application/x.sf3-log``
 - **Model** ``model/x.sf3``
+- **Physics-Model** ``model/x.sf3-physics``
 - **Text** ``text/x.sf3``
 - **Vector Graphic** ``image/x.sf3-vector``
 
@@ -477,5 +478,6 @@ The file extension should always end with ``.sf3``. Specifically, for the format
 - **Image** ``.img.sf3``
 - **Log** ``.log.sf3``
 - **Model** ``.mod.sf3``
+- **Physics-Model** ``.phys.sf3``
 - **Text** ``.txt.sf3``
 - **Vector Graphic** ``.vec.sf3``
