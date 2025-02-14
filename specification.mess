@@ -21,7 +21,7 @@ SF3 formats follow these principles:
 The following clarifies how to interpret certain words in regards to this standard:
 
 - **file** -- A bounded sequence of octets that should be interpreted as having a structure of one of the formats outlined in this standard.
-- **implementation** -- A program that is capabale of interpreting files in accordance with this specification.
+- **implementation** -- A program that is capable of interpreting files in accordance with this specification.
 - **must** -- If a file should violate this requirement, it is invalid and must be rejected by the implementation.
 - **must not** -- If a file should meet this requirement, it is invalid and must be rejected by the implementation.
 - **should** -- It is heavily recommended to follow this requirement, however implementations must be able to handle the case where this requirement is not met.
@@ -29,7 +29,7 @@ The following clarifies how to interpret certain words in regards to this standa
 - **may** -- The behaviour is optional, however implementations must be able to handle it.
 
 # Specification Description
-The format specifications in this document use a BNF-style abstract syntax language. The language is defined here:
+The format specifications in this document use a Backus-Naur-Form-style abstract syntax language. The language is defined here:
 
 :: BNF
 Format       ::= Definition+
