@@ -64,11 +64,12 @@ A ``Switch`` acts as a runtime switching based on the value of the referenced ``
 A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x:2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
 
 # Formats
-Each format is made up of the following structure, where a valid file must begin with the ``File`` rule.
+Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Payload`` is structured to always take up 16 octets.
 
 :: BNF
 File       ::= Identifier Header Payload
-Identifier ::= [ 81 53 46 33 00 E0 D0 0D 0A 0A ] format-id
+Identifier ::= [ 81 53 46 33 00 E0 D0 0D 0A 0A ] format-id checksum [ 00 ]
+checksum   ::= uint32 --- A CRC32 checksum of the Payload.
 format-id  ::= uint8 --- A single octet identifying the format.
 ::
 
