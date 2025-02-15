@@ -8,6 +8,33 @@
  :font-size 14pt
  :background white
  :color black)
+(body.front
+ :padding 0
+ :background none
+ :max-width none
+ (header
+  :background black
+  :color white
+  :text-align center
+  :font-size 1.5em
+  (h1
+   :margin 0
+   :padding 1em 1em))
+ (main
+  :background white
+  :max-width 600px
+  :margin 0 auto
+  :padding 2em
+  (nav
+   :font-size 1.25em
+   :margin 1em
+   (>a
+    :display block
+    :padding 0.2em
+    :color inherit
+    :text-decoration none
+    ((:parent :hover)
+     :color (hex A0A0A0))))))
 (.alert
  :background red
  :color white

@@ -11,7 +11,7 @@ jobs:
       - uses: Shirakumo/cl-markless@v1.2.8
         with:
           input: specification.mess
-          output: /tmp/markless/
+          output: specification.html
       - uses: Shirakumo/cl-markless@v1.2.8
         with:
           input: specification.mess
@@ -20,8 +20,9 @@ jobs:
           styling: style.tex
       - shell: bash
         run: |
-          cp specification.pdf style.css card.png /tmp/markless/
-          sed -e '/<main>/{r /tmp/markless/specification.html' -e 'd}' template.ctml > /tmp/markless/index.html
+          mkdir -p /tmp/markless/
+          cp specification.pdf style.css card.png index.html /tmp/markless/
+          sed -e '/<main>/{r specification.html' -e 'd}' template.ctml > /tmp/markless/specification.html
       - name: Upload Github Pages Artefact
         uses: actions/upload-pages-artifact@v3.0.1
         with:
