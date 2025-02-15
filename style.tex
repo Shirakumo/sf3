@@ -1,0 +1,56 @@
+\providecommand{\doctitle}{Simple File Format Family - SF3}
+\providecommand{\docauthor}{Yukari Hafner}
+\providecommand{\doccopyright}{Shirakumo}
+
+\usepackage{textcomp}
+\usepackage{fix-cm}
+\usepackage{ulem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage[top=1.5cm, bottom=2.5cm, left=1cm, right=1cm]{geometry}
+\setcounter{tocdepth}{2}
+
+\title{\doctitle}
+\author{\docauthor}
+\date{\d_mny\today}
+
+\hypersetup{
+  colorlinks,
+  linkcolor={black},
+  citecolor={blue!50!black},
+  urlcolor={blue!80!black}
+}
+
+\newcommand{\warn}[1]{
+  \begin{tcolorbox}[width=\textwidth,colback={red},boxrule=0pt,arc=0mm,fontupper=\bfseries,colupper=white]%
+    \begin{center}%
+      {\Large #1}%
+    \end{center}%
+  \end{tcolorbox}%
+}
+
+\newcommand{\mktitlepage}{
+\begin{titlepage}
+  \begin{center}
+    \warn{This document is not finalised. Do not use its contents as a reference as they may change in the future as the specification process advances.}
+    \vspace*{5cm}
+    {\bfseries\fontsize{32pt}{30pt}\selectfont\doctitle} \\
+    \vspace{0.5cm}
+    {\large v0.9}
+    \vfill
+    \begin{tabular}{ll}
+      Maintainer: & \docauthor{} <\href{mailto:shinmera@tymoon.eu}{shinmera@tymoon.eu}> \\
+      Project URL: & \url{https://shirakumo.org/docs/sf3} \\
+      Specification Source: & \url{https://shirakumo.org/projects/sf3} \\
+      Discussion Channel: & \url{irc://irc.libera.chat/\#shirakumo} \\
+    \end{tabular}
+  \end{center}
+\end{titlepage}}
+
+\AddToHook{cmd/section/before}{\clearpage}
+
+\AddToHook{begindocument/end}{
+  \mktitlepage
+  \tableofcontents
+  \newpage}

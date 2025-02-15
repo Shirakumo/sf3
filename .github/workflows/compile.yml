@@ -8,13 +8,19 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v1
-      - uses: Shirakumo/cl-markless@v1.2.4
+      - uses: Shirakumo/cl-markless@v1.2.8
         with:
           input: specification.mess
           output: /tmp/markless/
+      - uses: Shirakumo/cl-markless@v1.2.8
+        with:
+          input: specification.mess
+          output: specification.pdf
+          format: latex
+          styling: style.tex
       - shell: bash
         run: |
-          cp style.css card.png /tmp/markless/
+          cp specification.pdf style.css card.png /tmp/markless/
           sed -e '/<main>/{r /tmp/markless/specification.html' -e 'd}' template.ctml > /tmp/markless/index.html
       - name: Upload Github Pages Artefact
         uses: actions/upload-pages-artifact@v3.0.1
