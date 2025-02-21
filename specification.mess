@@ -45,6 +45,7 @@ Composable   ::= Rule
                | Type
                | Switch
                | BitRange
+               | BitCount
                | '(' Sequence ')'
 Counter      ::= OneOrMore
                | AnyNumber
@@ -62,6 +63,7 @@ ExactNumber  ::= '{' number '}'
 Switch       ::= '<' Rule SwitchCase ('|' SwitchCase)* '>'
 SwitchCase   ::= octet+ ':' Sequence
 BitRange     ::= Rule ':' (mask ',')? mask
+BitCount     ::= Rule '#'
 
 name     --- The name of a rule as a sequence of non-numeric ASCII
              characters.
@@ -78,6 +80,8 @@ White space unless otherwise mandated may be inserted liberally to aid readabili
 A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``.
 
 A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integer to the right by the first ``mask`` number of bits, if given. It then masks the remaining integer such that only the number of bits specified in the second ``mask`` remain. For example, ``x:2,4`` with ``x`` being the binary sequence ``10101101`` would leave the bits ``1011``.
+
+A ``BitCount`` is the number of set bits of the specified ``Rule``.
 
 # Formats
 Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Payload`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
@@ -393,38 +397,58 @@ format         ::= uint8
                --- A single octet identifying the per-vertex format.
 material-type  ::= uint8
                --- A single octet identifying the material used.
-material-count ::= material-type:4
+material-count ::= material-type#
                --- The number of material textures as indicated by
                    material-type.
 vertex         ::= <format 01: Position
-                        |  02: Position UV
-                        |  12: Position Color
-                        |  22: Position Normal
-                        |  03: Position UV Normal
-                        |  13: Position Color Normal
-                        |  04: Position UV Normal Tangent
-                        |  14: Position Color Normal Tangent>
+                        |  03: Position UV
+                        |  05: Position Color
+                        |  09: Position Normal
+                        |  0B: Position UV Normal
+                        |  0D: Position Color Normal
+                        |  1B: Position UV Normal Tangent
+                        |  1D: Position Color Normal Tangent>
                --- A single-vertex value in the format indicated by
                    format.
 ::
+
+The values for the vertex ``format`` encode the set of attributes as a bit set, where:
+
+- ``01`` --- Position
+- ``02`` --- UV
+- ``04`` --- Color
+- ``08`` --- Normal
+- ``10`` --- Tangent
+
+However only the values listed for the ``vertex`` type are valid.
 
 The values for ``material-type`` are interpreted as follows, and describe the usage and number of ``Texture``s:
 
 - ``00`` --- (no material)
 - ``01`` --- Albedo
-- ``02`` --- Albedo Normal
-- ``12`` --- Albedo Emission
-- ``03`` --- Albedo Normal Specular
-- ``13`` --- Albedo Normal Emission
-- ``23`` --- Albedo Normal Metallic
-- ``04`` --- Albedo Normal Metalness Roughness
-- ``14`` --- Albedo Normal Specular Emission
-- ``24`` --- Albedo Normal Metallic Emission
-- ``05`` --- Albedo Normal Metalness Roughness Emission
-- ``15`` --- Albedo Normal Metalness Roughness Occlusion
-- ``06`` --- Albedo Normal Metalness Roughness Occlusion Emission
+- ``03`` --- Albedo Normal
+- ``81`` --- Albedo Emission
+- ``43`` --- Albedo Normal Specular
+- ``83`` --- Albedo Normal Emission
+- ``07`` --- Albedo Normal Metallic
+- ``1B`` --- Albedo Normal Metalness Roughness
+- ``C3`` --- Albedo Normal Specular Emission
+- ``87`` --- Albedo Normal Metallic Emission
+- ``9B`` --- Albedo Normal Metalness Roughness Emission
+- ``3B`` --- Albedo Normal Metalness Roughness Occlusion
+- ``BB`` --- Albedo Normal Metalness Roughness Occlusion Emission
 
-Any other value for ``material-type`` is invalid.
+Any other value for ``material-type`` is invalid. It should be noted that the set of attributes is encoded as a bit set:
+
+- ``01`` --- Albedo
+- ``02`` --- Normal
+- ``04`` --- Metallic
+- ``08`` --- Metalness
+- ``10`` --- Roughness
+- ``20`` --- Occlusion
+- ``40`` --- Specular
+- ``80`` --- Emission
+
 The Metallic texture is a combination of Metalness, Roughness, and Occlusion in the R, G, and B channels respectively.
 
 The included ``MaterialSize`` field should allow constant-time access to the vertex data without having to parse the ``Material`` structure, if that structure is not needed. If the ``Faces`` array is empty, then the faces are implicit and every three vertices in the ``Vertices`` array form a face.
@@ -498,10 +522,9 @@ MarkupSize ::= uint64
 Markup     ::= Start End Option
            --- A singular markup option
 Start      ::= uint64
-           --- The starting (0-based) index of the region being
-               styled.
+           --- The (0-based) index of the first codepoint being styled.
 End        ::= uint64
-           --- The end (exclusive) index of the region being styled.
+           --- The (0-based) index of the last codepoint being styled.
 Option     ::= Bold
              | Italic
              | Underline
@@ -522,8 +545,7 @@ Strike     ::= [ 04 ]
            --- A line should be drawn between the text's baseline and
                ascent line.
 Mono       ::= [ 05 ]
-           --- The font should be set to proportional / monospaced
-               mode.
+           --- The font should be set to monospaced mode.
 Color      ::= [ 06 ] float32 float32 float32
            --- The text colour should be set to this R G B triplet.
 Size       ::= [ 07 ] float32
@@ -542,6 +564,8 @@ Address    ::= uint16 string{uint16}
 ::
 
 The font family, default font size, background colour, foreground colour, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option. If the ``Address`` of a ``Link`` is the same as that of a ``Target`` option, the ``Link`` markup should, when interacted with, point the user to the text marked up by the corresponding ``Target`` option. Otherwise the behaviour of interaction with the ``Link`` text is up to the implementation.
+
+The ``Markup`` options may be in any particular order with regards to their ``Start`` and ``End``, and the bounds may also overlap arbitrarily.
 
 ### Use-Case
 This format is useful for storing simple rich text documents that don't require complex layouting or processing.
@@ -564,15 +588,15 @@ Element      ::= Line | Rectangle | Circle | Polygon | Curve
 Line         ::= [ 01 ] Color Thickness ShapeOutline
 
              --- A sequence of connected line segments.
-Rectangle    ::= [ 02 ] ShapeFill ShapeBounds
+Rectangle    ::= [ 02 ] ShapeBounds ShapeFill
              --- An axis-aligned rectangle.
-Circle       ::= [ 03 ] ShapeFill ShapeBounds
+Circle       ::= [ 03 ] ShapeBounds ShapeFill
              --- An axis-aligned oval circle.
-Polygon      ::= [ 04 ] ShapeFill ShapeOutline
+Polygon      ::= [ 04 ] ShapeOutline ShapeFill
              --- A many-edged convex polygon.
-Curve        ::= [ 05 ] ShapeFill ShapeOutline
+Curve        ::= [ 05 ] ShapeOutline ShapeFill
              --- A cubic Bezier curve directed by its control points.
-Text         ::= [ 06 ] Color Point Font FontSize String
+Text         ::= [ 06 ] Point Color Font FontSize String
 
              --- A single line of text.
 Font         ::= uint16 string{uint16}
