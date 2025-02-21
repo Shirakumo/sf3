@@ -172,7 +172,7 @@ FrameCount  ::= uint64
             --- The number of audio frames in the file.
 sample-size ::= Format:4
             --- The number of octets per sample.
-sample      ::= <Format 01: int8
+sample      ::= <Format 01: uint8
                       | 02: int16
                       | 04: int32
                       | 08: int64
@@ -187,7 +187,21 @@ sample      ::= <Format 01: int8
                  by format.
 ::
 
-Any other value for ``format`` is invalid. If the ``format`` is ``01``, then the samples are stored according to the "A-law" non-linear scheme. Otherwise the samples are linear.
+The values for ``format`` are interpreted as follows, declaring the encoding of a single sample:
+
+- ``01`` unsigned 8-bit integer in the non-linear "A-law" scheme.
+- ``02`` signed 16-bit integer linear PCM.
+- ``04`` signed 32-bit integer linear PCM.
+- ``08`` signed 64-bit integer linear PCM.
+- ``11`` unsigned 8-bit integer in the non-linear "u-law" scheme.
+- ``12`` unsigned 16-bit integer linear PCM.
+- ``14`` unsigned 32-bit integer linear PCM.
+- ``18`` unsigned 64-bit integer linear PCM.
+- ``22`` 16-bit short-float linear PCM.
+- ``24`` 32-bit single-float linear PCM.
+- ``28`` 64-bit double-float linear PCM.
+
+Any other value for ``format`` is invalid.
 
 The values for ``channels`` are interpreted as follows, declaring the order and purpose of the channels:
 
