@@ -143,11 +143,11 @@ Checksum     ::= uint32
              --- A CRC32 checksum.
 Path         ::= uint16 string{uint16}
              --- The relative path of the corresponding file.
-Files        ::= FileOffset{Count} File{Count}
+Files        ::= FileOffset{Count} FilePayload{Count}
 FileOffset   ::= uint64
              --- The octet offset of the corresponding File from the
                  beginning of Files.
-File         ::= uint64 uint8{uint64}
+FilePayload  ::= uint64 uint8{uint64}
              --- A binary file payload.
 ::
 
