@@ -179,7 +179,7 @@ frame-count ::= uint64
             --- The number of audio frames in the file.
 sample-size ::= Format:4
             --- The number of octets per sample.
-Sample      ::= <Format 01: uint8
+Sample      ::= <format 01: uint8
                       | 02: int16
                       | 04: int32
                       | 08: int64
@@ -477,11 +477,13 @@ Payload      ::= mass Tensor shape-count Shape{shape-count}
 Tensor       ::= float32{9}
              --- The inertia tensor for the entire model, in row-major
                  order.
-Shape        ::= Transform <uint8 01: Ellipsoid
-                                | 02: Box
-                                | 03: Cylinder
-                                | 04: Pill
-                                | 05: Mesh>
+Shape        ::= Transform shape-type
+                 <shape-type 01: Ellipsoid
+                           | 02: Box
+                           | 03: Cylinder
+                           | 04: Pill
+                           | 05: Mesh>
+shape-type   ::= uint8
 Ellipsoid    ::= float32 float32 float32
              --- The width, height, and depth of the ellipsoid
                  measured from its centre.
@@ -540,36 +542,38 @@ Start          ::= uint64
                --- The (0-based) index of the first codepoint being styled.
 End            ::= uint64
                --- The (0-based) index of the last codepoint being styled.
-Option         ::= Bold
-                 | Italic
-                 | Underline
-                 | Strike
-                 | Mono
-                 | Color
-                 | Size
-                 | Heading
-                 | Link
+Option         ::= option-type <option-type 01: Bold
+                                          | 02: Italic
+                                          | 03: Underline
+                                          | 04: Strike
+                                          | 05: Mono
+                                          | 06: Color
+                                          | 07: Size
+                                          | 08: Heading
+                                          | 09: Link
+                                          | 0A: Target>
+option-type    ::= uint8
                --- A description of the text style.
-Bold           ::= [ 01 ]
+Bold           ::= 
                --- The font weight should be set to "bold"
-Italic         ::= [ 02 ]
+Italic         ::= 
                --- The font slant should be set to "italic"
-Underline      ::= [ 03 ]
+Underline      ::= 
                --- A line should be drawn under the text's baseline.
-Strike         ::= [ 04 ]
+Strike         ::= 
                --- A line should be drawn between the text's baseline and
                    ascent line.
-Mono           ::= [ 05 ]
+Mono           ::= 
                --- The font should be set to monospaced mode.
-Color          ::= [ 06 ] float32 float32 float32
+Color          ::= float32 float32 float32
                --- The text colour should be set to this R G B triplet.
-Size           ::= [ 07 ] float32
+Size           ::= float32
                --- The text size should be multiplied by this factor.
-Heading        ::= [ 08 ] Level
+Heading        ::= Level
                --- The text should be a heading of this level.
-Link           ::= [ 09 ] Address
+Link           ::= Address
                --- The text should be an interactable link to its address.
-Target         ::= [ 0A ] Address
+Target         ::= Address
                --- The text should be a link target for its address.
 Level          ::= uint8
                --- The heading level. The higher, the more deeply nested
@@ -600,18 +604,24 @@ Height        ::= uint32
 Count         ::= uint32
               --- The number of instructions to appear.
 Instruction   ::= Element | Transform
-Element       ::= Line | Rectangle | Circle | Polygon | Curve
-Line          ::= [ 01 ] Color Thickness ShapeOutline
+Element       ::= element-type <element-type 01: Line
+                                           | 02: Rectangle
+                                           | 03: Circle
+                                           | 04: Polygon
+                                           | 05: Curve
+                                           | 06: Text>
+element-type  ::= uint8
+Line          ::= Color Thickness ShapeOutline
               --- A sequence of connected line segments.
-Rectangle     ::= [ 02 ] ShapeBounds ShapeFill
+Rectangle     ::= ShapeBounds ShapeFill
               --- An axis-aligned rectangle.
-Circle        ::= [ 03 ] ShapeBounds ShapeFill
+Circle        ::= ShapeBounds ShapeFill
               --- An axis-aligned oval circle.
-Polygon       ::= [ 04 ] ShapeOutline ShapeFill
+Polygon       ::= ShapeOutline ShapeFill
               --- A many-edged convex polygon.
-Curve         ::= [ 05 ] ShapeOutline ShapeFill
+Curve         ::= ShapeOutline ShapeFill
               --- A cubic Bezier curve directed by its control points.
-Text          ::= [ 06 ] Point Color Font FontSize String
+Text          ::= Point Color Font FontSize String
               --- A single line of text.
 Font          ::= font-length string{font-length}
               --- The name of the font family to use to render the
@@ -620,11 +630,11 @@ font-length   ::= uint16
 String        ::= string-length string{string-length}
               --- The string of text to be displayed
 string-length ::= uint16
-Transform     ::= Identity | Matrix
-Identity      ::= [ 11 ]
+Transform     ::= transform-type <transform-type 11: Identity | 12: Matrix>
+Identity      ::= 
               --- A reset of the current transform matrix to the
                   1 0 0, 0 1 0 matrix.
-Matrix        ::= [ 12 ] float32{6}
+Matrix        ::= float32{6}
               --- A coordinate transform matrix to be applied to
                   subsequent instructions.
 ShapeOutline  ::= Edges Point{Edges}
