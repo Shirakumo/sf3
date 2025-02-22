@@ -165,7 +165,7 @@ This format is for storing plain audio sample data. It includes support for most
 
 :: BNF
 Header      ::= Samplerate Channels Format FrameCount
-Payload     ::= sample{Channels}{FrameCount}
+Payload     ::= (sample{Channels}){FrameCount}
 Samplerate  ::= uint32
             --- The samplerate in Hz.
 Channels    ::= uint8
