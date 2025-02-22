@@ -84,7 +84,7 @@ A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integ
 A ``BitCount`` is the number of set bits of the specified ``Rule``.
 
 # Formats
-Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Payload`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
+Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Header`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
 
 :: BNF
 File       ::= Identifier Header Payload
@@ -554,17 +554,12 @@ Option         ::= option-type <option-type 01: Bold
                                           | 0A: Target>
 option-type    ::= uint8
                --- A description of the text style.
-Bold           ::= 
-               --- The font weight should be set to "bold"
-Italic         ::= 
-               --- The font slant should be set to "italic"
-Underline      ::= 
-               --- A line should be drawn under the text's baseline.
-Strike         ::= 
-               --- A line should be drawn between the text's baseline and
+Bold           --- The font weight should be set to "bold"
+Italic         --- The font slant should be set to "italic"
+Underline      --- A line should be drawn under the text's baseline.
+Strike         --- A line should be drawn between the text's baseline and
                    ascent line.
-Mono           ::= 
-               --- The font should be set to monospaced mode.
+Mono           --- The font should be set to monospaced mode.
 Color          ::= float32 float32 float32
                --- The text colour should be set to this R G B triplet.
 Size           ::= float32
@@ -603,14 +598,16 @@ Height        ::= uint32
               --- The height of the visible canvas in units.
 Count         ::= uint32
               --- The number of instructions to appear.
-Instruction   ::= Element | Transform
-Element       ::= element-type <element-type 01: Line
-                                           | 02: Rectangle
-                                           | 03: Circle
-                                           | 04: Polygon
-                                           | 05: Curve
-                                           | 06: Text>
-element-type  ::= uint8
+Instruction   ::= instruction-type
+                  <instruction-type 01: Line
+                                  | 02: Rectangle
+                                  | 03: Circle
+                                  | 04: Polygon
+                                  | 05: Curve
+                                  | 06: Text
+                                  | 11: Identity
+                                  | 12: Matrix>
+instruction-type  ::= uint8
 Line          ::= Color Thickness ShapeOutline
               --- A sequence of connected line segments.
 Rectangle     ::= ShapeBounds ShapeFill
@@ -630,9 +627,7 @@ font-length   ::= uint16
 String        ::= string-length string{string-length}
               --- The string of text to be displayed
 string-length ::= uint16
-Transform     ::= transform-type <transform-type 11: Identity | 12: Matrix>
-Identity      ::= 
-              --- A reset of the current transform matrix to the
+Identity      --- A reset of the current transform matrix to the
                   1 0 0, 0 1 0 matrix.
 Matrix        ::= float32{6}
               --- A coordinate transform matrix to be applied to
