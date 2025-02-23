@@ -308,6 +308,8 @@ Where
 Any other value for ``channels`` is invalid.
 The payload must have exactly ``Width*Height*Depth*channel-count*format-size`` number of octets.
 
+The colours are stored in //linear// format without a perceptual colour space or gamma correction in effect. For the floating point formats, values ranged from 0 to 1 correspond to the same intensity of the minimal and maximal values of an unsigned integer format. However, a floating point format file //may// store values beyond that range. Both the floating point and signed integer formats //may// also store negative colour values, though SF3 makes no attempt to specify the perceptual display of these colours. The tone mapping process required to accurately render the colours stored in an SF3 Image in general is application dependent.
+
 ### Use-Case
 This format is useful for storing raw bitmap data that can be directly memory-mapped and read out. This is especially convenient for GPU texture uploads with DirectX, OpenGL, Vulkan, or similar.
 
