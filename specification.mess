@@ -110,8 +110,9 @@ The values for the ``format-id`` are interpreted as follows:
 - ``04`` --- Log
 - ``05`` --- Model
 - ``06`` --- Physics-Model
-- ``07`` --- Text
-- ``08`` --- Vector Graphic
+- ``07`` --- Table
+- ``08`` --- Text
+- ``09`` --- Vector Graphic
 
 Any other value for the ``format-id`` is reserved for future formats in this spec. If an implementation only supports a subset of these formats, it must generate an error when it encounters a ``format-id`` that it does not support.
 
@@ -526,6 +527,71 @@ The coordinate system is intended to be right handed with Y+ up, Z- forward.
 
 ### Use-Case
 This format is intended for use in games and other applications that require a convex decomposition of a model for use in collision testing. The packed storage format is ideal for direct use in-engine.
+
+! raw latex \newpage
+## Table
+This format specifies an arbitrary "table" similar to CSV files, albeit with a strict table schema encoded as part of the file.
+
+:: BNF
+Header        ::= spec-length column-count row-length row-count
+Payload       ::= ColumnSpec{column-count} Row{row-count}
+spec-length   ::= uint32
+              --- The length of the ColumnSpec block in octets.
+column-count  ::= uint16
+              --- The number of columns per row.
+row-length    ::= uint64
+              --- The length of every row in octets.
+row-count     ::= uint64
+              --- The number of rows in the file.
+ColumnSpec    ::= name-length string{name-length} column-length Column
+name-length   ::= uint16
+              --- The length of the column name in octets.
+column-length ::= uint32
+              --- The length of the column in octets.
+Column        ::= column-type <column-type 01: Uint8
+                                         | 02: Uint16
+                                         | 04: Uint32
+                                         | 08: Uint64
+                                         | 11: Int8
+                                         | 12: Int16
+                                         | 14: Int32
+                                         | 18: Int64
+                                         | 22: Float16
+                                         | 24: Float32
+                                         | 28: Float64
+                                         | 31: String
+                                         | 48: Timestamp
+                                         | 58: Nanoseconds>
+column-type   ::= uint8
+              --- The type of the column data
+element-size  ::= column-type:4
+              --- The number of octets per "element" of the column.
+Uint8         --- Denotes an array of unsigned 8-bit integers
+Uint16        --- Denotes an array of unsigned 16-bit integers
+Uint32        --- Denotes an array of unsigned 32-bit integers
+Uint64        --- Denotes an array of unsigned 64-bit integers
+Int8          --- Denotes an array of signed 8-bit integers
+Int16         --- Denotes an array of signed 16-bit integers
+Int32         --- Denotes an array of signed 32-bit integers
+Int64         --- Denotes an array of signed 64-bit integers
+Float16       --- Denotes an array of 16-bit IEEE half precision
+                  floating point numbers
+Float32       --- Denotes an array of 32-bit IEEE single precision
+                  floating point numbers
+Float64       --- Denotes an array of 64-bit IEEE double precision
+                  floating point numbers
+String        --- Denotes an UTF-8 encoded string
+Timestamp     --- Denotes an array of Universal-Time timestamps
+Nanoseconds   --- Denotes an array of nanoseconds
+Row           ::= uint8{row-length}
+::
+
+Usually the ``column-length`` will fit exactly one element, meaning it will be the same as ``element-size``, and each cell will not be an array but rather just one value. The ``row-length`` must be a sum of all ``column-length``s and merely serves as a faster way to index into the file. The ``column-length`` must be a multiple of ``element-size``. And thus, the number of logical elements in a column with an array type can be determined by dividing ``column-length`` by ``element-size``.
+
+The ``Row`` is specified as an opaque blob in the BNF, but can be trivially decoded according to the layout specified by the ``ColumnSpec``s. The data for each column must follow in the same order as the ``ColumnSpec``s inside the row, without any gaps between. A decoder can thus simply iterate over the ``ColumnSpec``s and decode each "cell" by first determining the number of elements, and then decoding each element in the cell according to the ``column-type``.
+
+### Use-Case
+This format lends itself well to structured data that follows a precise schema, especially when new data only needs to be appended such as when recording datapoints. The header fields allow constant-time random access to the rows as well as windowing of the data.
 
 ! raw latex \newpage
 ## Text
