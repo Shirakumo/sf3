@@ -581,7 +581,8 @@ Float32       --- Denotes an array of 32-bit IEEE single precision
                   floating point numbers.
 Float64       --- Denotes an array of 64-bit IEEE double precision
                   floating point numbers.
-String        --- Denotes an UTF-8 encoded string.
+String        --- Denotes an UTF-8 encoded, null-terminated
+                  character string.
 Timestamp     --- Denotes an array of signed 64-bit integers that
                   encode Unix-time timestamps.
 HighResolutionTimestamp
@@ -596,6 +597,8 @@ Row           ::= uint8{row-length}
 Usually the ``column-length`` will fit exactly one element, meaning it will be the same as ``element-size``, and each cell will not be an array but rather just one value. The ``row-length`` must be a sum of all ``column-length``s and merely serves as a faster way to index into the file. The ``column-length`` must be a multiple of ``element-size``. And thus, the number of logical elements in a column with an array type can be determined by dividing ``column-length`` by ``element-size``.
 
 The ``Row`` is specified as an opaque blob in the BNF, but can be trivially decoded according to the layout specified by the ``ColumnSpec``s. The data for each column must follow in the same order as the ``ColumnSpec``s inside the row, without any gaps between. A decoder can thus simply iterate over the ``ColumnSpec``s and decode each "cell" by first determining the number of elements, and then decoding each element in the cell according to the ``column-type``.
+
+For ``String`` columns especially it should be noted that, due to the null termination, the string may be //shorter// than the number of bytes reserved by the ``column-length``.
 
 ### Use-Case
 This format lends itself well to structured data that follows a precise schema, especially when new data only needs to be appended such as when recording datapoints. The header fields allow constant-time random access to the rows as well as windowing of the data.
