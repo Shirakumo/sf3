@@ -581,8 +581,10 @@ Float32       --- Denotes an array of 32-bit IEEE single precision
 Float64       --- Denotes an array of 64-bit IEEE double precision
                   floating point numbers
 String        --- Denotes an UTF-8 encoded string
-Timestamp     --- Denotes an array of Universal-Time timestamps
-Nanoseconds   --- Denotes an array of nanoseconds
+Timestamp     --- Denotes an array of signed 64-bit integers that
+                  encode Unix-time timestamps
+Nanoseconds   --- Denotes an array of unsigned 64-bit integers that
+                  encode nanoseconds of time
 Row           ::= uint8{row-length}
 ::
 
