@@ -561,7 +561,8 @@ Column        ::= column-type <column-type 01: Uint8
                                          | 28: Float64
                                          | 31: String
                                          | 48: Timestamp
-                                         | 58: HighResolutionTimestamp>
+                                         | 58: HighResolutionTimestamp
+                                         | 61: Boolean>
 column-type   ::= uint8
               --- The type of the column data.
 element-size  ::= column-type:4
@@ -587,6 +588,8 @@ HighResolutionTimestamp
               --- Denotes an array of unsigned 64-bit integers that
                   encode timestamps as the number of nanoseconds
                   since the Unix epoch.
+Boolean       --- Denotes an array of unsigned 8-bit integers where
+                  0 is denoted "False" and any other value "True".
 Row           ::= uint8{row-length}
 ::
 
