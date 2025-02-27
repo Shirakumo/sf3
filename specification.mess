@@ -561,30 +561,32 @@ Column        ::= column-type <column-type 01: Uint8
                                          | 28: Float64
                                          | 31: String
                                          | 48: Timestamp
-                                         | 58: Nanoseconds>
+                                         | 58: HighResolutionTimestamp>
 column-type   ::= uint8
-              --- The type of the column data
+              --- The type of the column data.
 element-size  ::= column-type:4
               --- The number of octets per "element" of the column.
-Uint8         --- Denotes an array of unsigned 8-bit integers
-Uint16        --- Denotes an array of unsigned 16-bit integers
-Uint32        --- Denotes an array of unsigned 32-bit integers
-Uint64        --- Denotes an array of unsigned 64-bit integers
-Int8          --- Denotes an array of signed 8-bit integers
-Int16         --- Denotes an array of signed 16-bit integers
-Int32         --- Denotes an array of signed 32-bit integers
-Int64         --- Denotes an array of signed 64-bit integers
+Uint8         --- Denotes an array of unsigned 8-bit integers.
+Uint16        --- Denotes an array of unsigned 16-bit integers.
+Uint32        --- Denotes an array of unsigned 32-bit integers.
+Uint64        --- Denotes an array of unsigned 64-bit integers.
+Int8          --- Denotes an array of signed 8-bit integers.
+Int16         --- Denotes an array of signed 16-bit integers.
+Int32         --- Denotes an array of signed 32-bit integers.
+Int64         --- Denotes an array of signed 64-bit integers.
 Float16       --- Denotes an array of 16-bit IEEE half precision
-                  floating point numbers
+                  floating point numbers.
 Float32       --- Denotes an array of 32-bit IEEE single precision
-                  floating point numbers
+                  floating point numbers.
 Float64       --- Denotes an array of 64-bit IEEE double precision
-                  floating point numbers
-String        --- Denotes an UTF-8 encoded string
+                  floating point numbers.
+String        --- Denotes an UTF-8 encoded string.
 Timestamp     --- Denotes an array of signed 64-bit integers that
-                  encode Unix-time timestamps
-Nanoseconds   --- Denotes an array of unsigned 64-bit integers that
-                  encode nanoseconds of time
+                  encode Unix-time timestamps.
+HighResolutionTimestamp
+              --- Denotes an array of unsigned 64-bit integers that
+                  encode timestamps as the number of nanoseconds
+                  since the Unix epoch.
 Row           ::= uint8{row-length}
 ::
 
