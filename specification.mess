@@ -75,7 +75,7 @@ number   --- A textual description of the number of occurrences. Can
 mask     --- A textual description of the number of bits to use.
 ::
 
-White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a UTF-8 encoded character sequence with an octet length as indicated by the required following ``ExactNumber`` rule.
+White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a null-terminated UTF-8 encoded character sequence with an octet length (including null-terminator) as indicated by the required following ``ExactNumber`` rule.
 
 A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``.
 
