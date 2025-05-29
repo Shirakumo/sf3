@@ -8,11 +8,11 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v1
-      - uses: Shirakumo/cl-markless@v1.2.8
+      - uses: Shirakumo/cl-markless@v1.2.9
         with:
           input: specification.mess
           output: specification.html
-      - uses: Shirakumo/cl-markless@v1.2.8
+      - uses: Shirakumo/cl-markless@v1.2.9
         with:
           input: specification.mess
           output: specification.pdf

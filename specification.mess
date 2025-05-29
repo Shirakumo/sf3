@@ -84,7 +84,7 @@ A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integ
 A ``BitCount`` is the number of set bits of the specified ``Rule``.
 
 # Formats
-Each format is made up of the following structure, where a valid file must begin with the ``File`` rule. The prefix to the ``Header`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
+Each format is made up of the following structure, where a valid file must begin and end with the ``File`` rule. The prefix to the ``Header`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
 
 :: BNF
 File       ::= Identifier Header Payload
@@ -104,15 +104,15 @@ The rationale for the ten octets in the identifier is as follows:
 The ``Header`` and ``Payload`` will be described by the individual formats.
 The values for the ``format-id`` are interpreted as follows:
 
-- ``01`` --- ''Archive''(link Archive)
-- ``02`` --- ''Audio''(link Audio)
-- ``03`` --- ''Image''(link Image)
-- ``04`` --- ''Log''(link Log)
-- ``05`` --- ''Model''(link Model)
-- ``06`` --- ''Physics-Model''(link Physics-Model)
-- ``07`` --- ''Table''(link Table)
-- ``08`` --- ''Text''(link Text)
-- ``09`` --- ''Vector Graphic''(link Vector Graphic)
+- ``01`` --- ''Archive''(link #Archive)
+- ``02`` --- ''Audio''(link #Audio)
+- ``03`` --- ''Image''(link #Image)
+- ``04`` --- ''Log''(link #Log)
+- ``05`` --- ''Model''(link #Model)
+- ``06`` --- ''Physics-Model''(link #Physics-Model)
+- ``07`` --- ''Table''(link #Table)
+- ``08`` --- ''Text''(link #Text)
+- ``09`` --- ''Vector Graphic''(link #Vector Graphic)
 
 Any other value for the ``format-id`` is reserved for future formats in this spec. If an implementation only supports a subset of these formats, it must generate an error when it encounters a ``format-id`` that it does not support.
 
