@@ -1,10 +1,12 @@
 meta:
   id: sf3_vector_graphic
-  file-extension: vec.sf3
   title: SF3 Vector Graphic
+  file-extension: vec.sf3
+  xref:
+    mime: image/x.sf3-vector
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:

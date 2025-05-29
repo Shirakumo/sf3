@@ -1,10 +1,12 @@
 meta:
   id: sf3_audio
-  file-extension: au.sf3
   title: SF3 Audio
+  file-extension: au.sf3
+  xref:
+    mime: audio/x.sf3
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:

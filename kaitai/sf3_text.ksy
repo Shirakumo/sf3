@@ -1,10 +1,12 @@
 meta:
   id: sf3_text
-  file-extension: txt.sf3
   title: SF3 Text
+  file-extension: txt.sf3
+  xref:
+    mime: application/x.sf3-text
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:

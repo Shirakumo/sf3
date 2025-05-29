@@ -1,10 +1,12 @@
 meta:
   id: sf3_model
-  file-extension: mod.sf3
   title: SF3 Model
+  file-extension: mod.sf3
+  xref:
+    mime: model/x.sf3
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:

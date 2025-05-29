@@ -1,10 +1,12 @@
 meta:
   id: sf3_image
-  file-extension: img.sf3
   title: SF3 Image
+  file-extension: img.sf3
+  xref:
+    mime: image/x.sf3
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:

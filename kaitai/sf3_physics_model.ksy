@@ -1,10 +1,12 @@
 meta:
   id: sf3_physics_model
-  file-extension: phys.sf3
   title: SF3 Physics-Model
+  file-extension: phys.sf3
+  xref:
+    mime: model/x.sf3-physics
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:

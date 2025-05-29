@@ -1,10 +1,12 @@
 meta:
   id: sf3_archive
-  file-extension: ar.sf3
   title: SF3 Archive
+  file-extension: ar.sf3
+  xref:
+    mime: application/x.sf3-archive
   license: zlib
   ks-version: 0.8
-  encoding: ASCII
+  encoding: UTF-8
   endian: le
 doc-ref: https://shirakumo.org/docs/sf3
 seq:
