@@ -21,7 +21,7 @@ jobs:
       - shell: bash
         run: |
           mkdir -p /tmp/markless/
-          cp specification.pdf style.css card.png index.html /tmp/markless/
+          cp -r specification.pdf style.css card.png index.html kaitai /tmp/markless/
           sed -e '/<main>/{r specification.html' -e 'd}' template.ctml > /tmp/markless/specification.html
       - name: Upload Github Pages Artefact
         uses: actions/upload-pages-artifact@v3.0.1

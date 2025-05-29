@@ -163,6 +163,10 @@ Each ``EntryOffset`` in ``Metadata``, and each ``FileOffset`` in ``Files`` must 
 ### Use-Case
 This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.
 
+### Supporting Files
+- ''sf3_archive.ksy''(link kaitai/sf3_archive.ksy)
+  A Kaitai Struct reference implementation of the format.
+
 ! raw latex \newpage
 ## Audio
 This format is for storing plain audio sample data. It includes support for most types of sample formats and channel numbers out there. The sample channels are interleaved, allowing the file to be written on the fly.
@@ -241,6 +245,10 @@ The payload must have exactly ``FrameCount*Channels*sample-size`` number of octe
 ### Use-Case
 This format is useful for raw audio data storage, which means it should be trivial to feed into an audio playback system with minimal overhead. Unlike the traditional uncompressed audio format, Wave, this follows a much clearer and simpler specification with sensible metadata encoding.
 
+### Supporting Files
+- ''sf3_audio.ksy''(link kaitai/sf3_audio.ksy)
+  A Kaitai Struct reference implementation of the format.
+
 ! raw latex \newpage
 ## Image
 This format is for storing raw image data. Unlike plain data however, it includes a header that completely identifies the pixel data layout and format. The format supports 3D images as well.
@@ -314,6 +322,10 @@ The colours are stored in //linear// format without a perceptual colour space or
 ### Use-Case
 This format is useful for storing raw bitmap data that can be directly memory-mapped and read out. This is especially convenient for GPU texture uploads with DirectX, OpenGL, Vulkan, or similar.
 
+### Supporting Files
+- ''sf3_image.ksy''(link kaitai/sf3_image.ksy)
+  A Kaitai Struct reference implementation of the format.
+
 ! raw latex \newpage
 ## Log
 This format is for storing generic logging and event information.
@@ -371,6 +383,10 @@ The ``EntryOffset``s allow a reading application to scan through the log much mo
 
 ### Use-Case
 This format is useful for basic logging purposes in applications that run for a longer amount of time.The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
+
+### Supporting Files
+- ''sf3_log.ksy''(link kaitai/sf3_log.ksy)
+  A Kaitai Struct reference implementation of the format.
 
 ! raw latex \newpage
 ## Model
@@ -470,6 +486,10 @@ The coordinate system is intended to be right handed with Y+ up, Z- forward.
 ### Use-Case
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
 
+### Supporting Files
+- ''sf3_model.ksy''(link kaitai/sf3_model.ksy)
+  A Kaitai Struct reference implementation of the format.
+
 ! raw latex \newpage
 ## Physics-Model
 This format is for storing a series of convex meshes that make up the collision shapes of a more complex model. It is far more efficient at storing this data than the generic model format and allows multiple shapes in one.
@@ -528,6 +548,10 @@ The coordinate system is intended to be right handed with Y+ up, Z- forward.
 
 ### Use-Case
 This format is intended for use in games and other applications that require a convex decomposition of a model for use in collision testing. The packed storage format is ideal for direct use in-engine.
+
+### Supporting Files
+- ''sf3_physics_model.ksy''(link kaitai/sf3_physics_model.ksy)
+  A Kaitai Struct reference implementation of the format.
 
 ! raw latex \newpage
 ## Table
@@ -604,6 +628,10 @@ For ``String`` columns especially it should be noted that, due to the null termi
 ### Use-Case
 This format lends itself well to structured data that follows a precise schema, especially when new data only needs to be appended such as when recording datapoints. The header fields allow constant-time random access to the rows as well as windowing of the data.
 
+### Supporting Files
+- ''sf3_table.ksy''(link kaitai/sf3_table.ksy)
+  A Kaitai Struct reference implementation of the format.
+
 ! raw latex \newpage
 ## Text
 This format allows for a very simple rich text markup. Primitive displays can also ignore all the markup directly and instead display the text plain without needing special processing to strip the markup out.
@@ -663,6 +691,10 @@ The ``Markup`` options may be in any particular order with regards to their ``St
 
 ### Use-Case
 This format is useful for storing simple rich text documents that don't require complex layouting or processing.
+
+### Supporting Files
+- ''sf3_text.ksy''(link kaitai/sf3_text.ksy)
+  A Kaitai Struct reference implementation of the format.
 
 ! raw latex \newpage
 ## Vector Graphic
@@ -751,6 +783,10 @@ If a visualiser or editor of a vector graphic file does not have access to the f
 
 ### Use-Case
 This format is useful for representing vector graphics in a light-weight way that should be easy to write a visualiser for. It intentionally does not specify much about text processing and instead leaves most of this up to the implementation.
+
+### Supporting Files
+- ''sf3_vector_graphic.ksy''(link kaitai/sf3_vector_graphic.ksy)
+  A Kaitai Struct reference implementation of the format.
 
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
