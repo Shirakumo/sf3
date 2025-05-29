@@ -1,6 +1,6 @@
 meta:
   id: sf3_model
-  file-extension: ar.sf3
+  file-extension: mod.sf3
   title: SF3 Model
   license: zlib
   ks-version: 0.8
@@ -16,7 +16,7 @@ seq:
     type: u4
   - id: null_terminator
     contents: [0]
-  - id: payload
+  - id: model
     type: model
 types:
   string2:
@@ -40,10 +40,11 @@ types:
       - id: vertex_data
         type: vertex_data
   material:
-    - id: textures
-      type: string2
-      repeat: expr
-      repeat-expr: material_count
+    seq:
+      - id: textures
+        type: string2
+        repeat: expr
+        repeat-expr: _parent.material_type.material_count
   vertex_data:
     seq:
       - id: face_count
@@ -95,4 +96,12 @@ types:
       has_emission:
         value: 0 != (raw & 0x80)
       material_count:
-        value: (raw >> 0) & 1 + (raw >> 1) & 1 + (raw >> 2) & 1 + (raw >> 3) & 1 + (raw >> 4) & 1 + (raw >> 5) & 1 + (raw >> 6) & 1 + (raw >> 7) & 1
+        value: >
+          (raw >> 0) & 1 +
+          (raw >> 1) & 1 + 
+          (raw >> 2) & 1 + 
+          (raw >> 3) & 1 + 
+          (raw >> 4) & 1 + 
+          (raw >> 5) & 1 + 
+          (raw >> 6) & 1 + 
+          (raw >> 7) & 1

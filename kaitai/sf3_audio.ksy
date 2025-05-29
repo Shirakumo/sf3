@@ -1,6 +1,6 @@
 meta:
   id: sf3_audio
-  file-extension: ar.sf3
+  file-extension: au.sf3
   title: SF3 Audio
   license: zlib
   ks-version: 0.8
@@ -16,7 +16,7 @@ seq:
     type: u4
   - id: null_terminator
     contents: [0]
-  - id: payload
+  - id: audio
     type: audio
 types:
   audio:
@@ -34,19 +34,19 @@ types:
         repeat: expr
         repeat-expr: channels * frame_count
         type:
-          switch_on: format
+          switch-on: format
           cases:
-            0x01: u1
-            0x02: s2
-            0x04: s4
-            0x08: s8
-            0x11: u1
-            0x12: s2
-            0x14: s4
-            0x18: s8
-            0x22: f2
-            0x24: f4
-            0x28: f8
+            'formats::uint8_alaw': u1
+            'formats::int16_pcm': s2
+            'formats::int32_pcm': s4
+            'formats::int64_pcm': s8
+            'formats::uint8_ulaw': u1
+            'formats::uint16_pcm': s2
+            'formats::uint32_pcm': s4
+            'formats::uint64_pcm': s8
+            'formats::float16_pcm': f2
+            'formats::float32_pcm': f4
+            'formats::float64_pcm': f8
 enums:
   formats:
     0x01: uint8_alaw

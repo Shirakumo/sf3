@@ -1,6 +1,6 @@
 meta:
   id: sf3_log
-  file-extension: ar.sf3
+  file-extension: log.sf3
   title: SF3 Log
   license: zlib
   ks-version: 0.8
@@ -16,7 +16,7 @@ seq:
     type: u4
   - id: null_terminator
     contents: [0]
-  - id: payload
+  - id: log
     type: log
 types:
   string1:

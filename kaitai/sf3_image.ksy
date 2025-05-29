@@ -1,6 +1,6 @@
 meta:
   id: sf3_image
-  file-extension: ar.sf3
+  file-extension: img.sf3
   title: SF3 Image
   license: zlib
   ks-version: 0.8
@@ -16,7 +16,7 @@ seq:
     type: u4
   - id: null_terminator
     contents: [0]
-  - id: payload
+  - id: image
     type: image
 types:
   image:
@@ -37,22 +37,22 @@ types:
         repeat: expr
         repeat-expr: depth * height * width * channel_count
         type:
-          switch_on: format
+          switch-on: format
           cases:
-            0x01: s1
-            0x02: s2
-            0x04: s4
-            0x08: s8
-            0x11: u1
-            0x12: u2
-            0x14: u4
-            0x18: u8
-            0x22: f2
-            0x24: f4
-            0x28: f8
-instances:
-  channel_count:
-    value: channels & 0b1111
+            'formats::int8': s1
+            'formats::int16': s2
+            'formats::int32': s4
+            'formats::int64': s8
+            'formats::uint8': u1
+            'formats::uint16': u2
+            'formats::uint32': u4
+            'formats::uint64': u8
+            'formats::float16': f2
+            'formats::float32': f4
+            'formats::float64': f8
+    instances:
+      channel_count:
+        value: channel_format.to_i & 0b1111
 enums:
   layouts:
     0x01: v

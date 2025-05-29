@@ -16,7 +16,7 @@ seq:
     type: u4
   - id: null_terminator
     contents: [0]
-  - id: payload
+  - id: archive
     type: archive
 types:
   string1:
