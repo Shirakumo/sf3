@@ -719,7 +719,7 @@ Instruction   ::= instruction-type
                                   | 11: Identity
                                   | 12: Matrix>
 instruction-type  ::= uint8
-Line          ::= Color Thickness ShapeOutline
+Line          ::= ShapeOutline Color Thickness
               --- A sequence of connected line segments.
 Rectangle     ::= ShapeBounds ShapeFill
               --- An axis-aligned rectangle.

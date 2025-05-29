@@ -52,12 +52,12 @@ types:
             'instruction_types::matrix': matrix
   line:
     seq:
+      - id: outline
+        type: shape_outline
       - id: color
         type: color
       - id: thickness
         type: f4
-      - id: outline
-        type: shape_outline
   rectangle:
     seq:
       - id: bounds
