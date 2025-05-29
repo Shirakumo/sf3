@@ -475,8 +475,8 @@ This format is useful for storing uncompressed, directly accessible 3D geometry 
 This format is for storing a series of convex meshes that make up the collision shapes of a more complex model. It is far more efficient at storing this data than the generic model format and allows multiple shapes in one.
 
 :: BNF
-Header       ::= format hull-count
-Payload      ::= mass Tensor shape-count Shape{shape-count}
+Header       ::= shape-count
+Payload      ::= mass Tensor Shape{shape-count}
 Tensor       ::= float32{9}
              --- The inertia tensor for the entire model, in row-major
                  order.
@@ -498,7 +498,8 @@ Cylinder     ::= float32 float32 float32
                  cylinder measured from its centre.
 Pill         ::= float32 float32 float32
              --- The bottom radius, top radius, and height of the
-                 cylinder measured from its centre.
+                 cylinder measured from its centre to the centre of
+                 the top sphere.
 Mesh         ::= vertex-count Vertex{vertex-count}
              --- A single convex hull as a series of vertices forming
                  its surface.
