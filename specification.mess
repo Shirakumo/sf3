@@ -643,7 +643,7 @@ This format lends itself well to structured data that follows a precise schema, 
 
 ! raw latex \newpage
 ## Text
-This format allows for a very simple rich text markup. Primitive displays can also ignore all the markup directly and instead display the text plain without needing special processing to strip the markup out.
+This format allows for a very simple rich text markup. The separation of the text from the markup makes it trivial to access its contents, avoiding complex parsing logic.
 
 :: BNF
 Header         ::= markup-size
@@ -697,6 +697,8 @@ address-length ::= uint16
 The font family, default font size, background colour, foreground colour, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option. If the ``Address`` of a ``Link`` is the same as that of a ``Target`` option, the ``Link`` markup should, when interacted with, point the user to the text marked up by the corresponding ``Target`` option. Otherwise the behaviour of interaction with the ``Link`` text is up to the implementation.
 
 The ``Markup`` options may be in any particular order with regards to their ``Start`` and ``End``, and the bounds may also overlap arbitrarily.
+
+An implementation that is incapable of rendering some of the rich markup //may// modify the displayed text to preserve some of the markup in a visible, albeit textual manner. Particularly, if an implementation is incapable of presenting user-interactive links, the ``Link`` option should be rendered by showing the ``Address`` after the ``End`` of the ``Markup``.
 
 ### Use-Case
 This format is useful for storing simple rich text documents that don't require complex layouting or processing.
