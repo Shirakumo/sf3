@@ -88,6 +88,10 @@ types:
             'column_types::timestamp': s8
             'column_types::high_resolution_timestamp': u8
             'column_types::boolean': u1
+  f2:
+    seq:
+      - id: bits
+        type: u2
 enums:
   column_types:
     0x01: uint8

@@ -55,6 +55,10 @@ types:
     instances:
       channel_count:
         value: channel_format.to_i & 0b1111
+  f2:
+    seq:
+      - id: bits
+        type: u2
 enums:
   layouts:
     0x01: v

@@ -49,6 +49,10 @@ types:
             'formats::float16_pcm': f2
             'formats::float32_pcm': f4
             'formats::float64_pcm': f8
+  f2:
+    seq:
+      - id: bits
+        type: u2
 enums:
   formats:
     0x01: uint8_alaw
