@@ -778,6 +778,8 @@ The coordinate system should be defined with X growing to the right, Y growing u
 
 When an element with a ``ShapeFill`` should be drawn, the fill must be drawn first, with the outline (if visible) second on top. If the shape is bounded by ``ShapeBounds``, the fill should meet the bounds, and the outline should be centred on the bounds when hitting them. If the shape is bounded by a ``ShapeOutline``, the outline must be drawn centred on the lines defined by the ``Edge``s.
 
+When elements overlap, they should be drawn in the order that is specified in the file, with the colours being blended via the standard "source over" blending method.
+
 For ``Curve`` and ``Polygon``, if the ``Point``s do not form a closed shape, the fill should be drawn as a closed shape by directly connecting the first and last points with a straight line. The ``Point``s of the outline //must// be given in counter-clockwise order.
 
 In the case of the ``Curve``, the points should be interpreted as follows: ``EdgePoint ControlPoint (ControlPoint EdgePoint ControlPoint)* ControlPoint EdgePoint``. As such, the ``Edges`` number for a ``Curve`` must always match ``x+2 % 3 == 0`` and must at least be ``4``. Any other value is an error. The ``ControlPoint`` coordinates are relative to their corresponding ``EdgePoint``.
