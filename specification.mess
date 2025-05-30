@@ -1,6 +1,6 @@
 ; -*- mode: markless-mode; fill-column: 60; -*-
 # Introduction
-SF3 (Simple File Format Family) is a family of file format specifications. These file formats all follow a similar scheme and the same principles. They are intended to be easy to read and write, and cover base use-cases of various binary formats.
+SF3 (Simple File Format Family) is a family of file format specifications. These file formats all follow a similar scheme and the same principles. They are //not// intended to be general-purpose replacements for existing file formats, but instead fill the niche of being easy to implement and understand, traversable in-memory, and still cover base use-cases for a variety of binary file formats.
 
 ## Principles
 SF3 formats follow these principles:
@@ -784,7 +784,9 @@ For ``Curve`` and ``Polygon``, if the ``Point``s do not form a closed shape, the
 
 In the case of the ``Curve``, the points should be interpreted as follows: ``EdgePoint ControlPoint (ControlPoint EdgePoint ControlPoint)* ControlPoint EdgePoint``. As such, the ``Edges`` number for a ``Curve`` must always match ``x+2 % 3 == 0`` and must at least be ``4``. Any other value is an error. The ``ControlPoint`` coordinates are relative to their corresponding ``EdgePoint``.
 
-In the case of ``Polygon`` and ``Line``, the ``Edges`` number must be at least ``2``. Any other value is an error.
+In the case of ``Polygon`` and ``Line``, the ``Edges`` number must be at least ``1``. Zero edges is an error. In the case of ``1``, only the outline is visible as a dot. In the case of ``2``, again only the outline is visible as a single segmented line.
+
+For ``Curve``, ``Polygon``, and ``Line``, the outline, if any, should be drawn using circular end-caps and circular joints between the individual line segments.
 
 For the ``Size``, ``Thickness``, ``FontSize``, and ``Color``, all float components must be positive and real. Infinities, NaNs, and negative numbers are an error.
 
