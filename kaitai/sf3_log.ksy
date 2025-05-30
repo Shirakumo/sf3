@@ -41,6 +41,8 @@ types:
     seq:
       - id: start_time
         type: s8
+      - id: end_time
+        type: s8
       - id: chunk_count
         type: u2
       - id: chunks

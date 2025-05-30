@@ -184,7 +184,7 @@ format      ::= uint8
             --- A single octet identifying the per-sample data type.
 frame-count ::= uint64
             --- The number of audio frames in the file.
-sample-size ::= Format:4
+sample-size ::= format:4
             --- The number of octets per sample.
 Sample      ::= <format 01: uint8
                       | 02: int16
@@ -264,14 +264,14 @@ Color         ::= channel{channel-count}
 Width         ::= uint32
 Height        ::= uint32
 Depth         ::= uint32
-format        ::= uint8
-              --- A single octet identifying the per-channel data type.
 channels      ::= uint8
               --- A single octet identifying the number and order of
                   channels.
 channel-count ::= channels:4
               --- The number of channels indicated by the lower 4 bits
                   of the channels.
+format        ::= uint8
+              --- A single octet identifying the per-channel data type.
 format-size   ::= format:4
               --- The number of octets per channel sample.
 channel       ::= <format 01: int8
@@ -333,12 +333,15 @@ This format is useful for storing raw bitmap data that can be directly memory-ma
 This format is for storing generic logging and event information.
 
 :: BNF
-Header          ::= StartTime ChunkCount
+Header          ::= StartTime EndTime ChunkCount
 Payload         ::= Chunk*
 Chunk           ::= ChunkSize EntryCount EntryOffset{EntryCount} Entry{EntryCount}
 StartTime       ::= int64
                 --- A unix-time timestamp specifying when this file
                     begins.
+EndTime         ::= int64
+                --- A unix-time timestamp specifying when this file
+                    ends.
 Entry           ::= Size Time Severity Source Category Message
 Size            ::= uint32
                 --- The size of the remaining log entry in octets.
@@ -382,6 +385,10 @@ The format is designed such that an application can continuously append new entr
 4. Otherwise start from 1.
 
 The ``EntryOffset``s allow a reading application to scan through the log much more quickly, and perform a binary search to identify date ranges.
+
+The ``Time`` in each successive ``Entry`` //should// monotonically increase, though an implementation //may// emit them locally out of order. That is, within a bounded sequence of entries, the ``Time`` //must// be increasing overall, but individual entries may be out of order.
+
+When ``EndTime`` is equivalent to the largest positive 64-bit integer, the file is considered to still be "open" and new entries may yet be appended to it.
 
 ### Use-Case
 This format is useful for basic logging purposes in applications that run for a longer amount of time.The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
