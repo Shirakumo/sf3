@@ -774,7 +774,7 @@ FontSize      ::= float32
               --- The size of an em in units.
 ::
 
-The coordinate system should be defined with X growing to the right, Y growing upwards, and the origin being in the lower left corner of the canvas. Whenever a ``Transform`` is applied, the given matrix must be applied to all following ``Element``s until the next ``Transform``. This transformation applies to the shape as a whole, not just the ``Point``s that define it in the file.
+The coordinate system should be defined with X growing to the right, Y growing upwards, and the origin being in the lower left corner of the canvas. Whenever a ``Matrix`` is applied, the given matrix must be applied to all following ``Element``s until the next ``Matrix`` or ``Identity``. This transformation applies to the shape as a whole, including its size and orientation, not just the ``Point``s that define it in the file.
 
 When an element with a ``ShapeFill`` should be drawn, the fill must be drawn first, with the outline (if visible) second on top. If the shape is bounded by ``ShapeBounds``, the fill should meet the bounds, and the outline should be centred on the bounds when hitting them. If the shape is bounded by a ``ShapeOutline``, the outline must be drawn centred on the lines defined by the ``Edge``s.
 
@@ -782,7 +782,7 @@ For ``Curve`` and ``Polygon``, if the ``Point``s do not form a closed shape, the
 
 In the case of the ``Curve``, the points should be interpreted as follows: ``EdgePoint ControlPoint (ControlPoint EdgePoint ControlPoint)* ControlPoint EdgePoint``. As such, the ``Edges`` number for a ``Curve`` must always match ``x+2 % 3 == 0`` and must at least be ``4``. Any other value is an error. The ``ControlPoint`` coordinates are relative to their corresponding ``EdgePoint``.
 
-In the case of ``Polygon`` and ``Rectangle``, the ``Edges`` number must be at least ``2``. Any other value is an error.
+In the case of ``Polygon`` and ``Line``, the ``Edges`` number must be at least ``2``. Any other value is an error.
 
 For the ``Size``, ``Thickness``, ``FontSize``, and ``Color``, all float components must be positive and real. Infinities, NaNs, and negative numbers are an error.
 
