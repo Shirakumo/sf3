@@ -75,7 +75,9 @@ number   --- A textual description of the number of occurrences. Can
 mask     --- A textual description of the number of bits to use.
 ::
 
-White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits. ``string`` designates a null-terminated UTF-8 encoded character sequence with an octet length (including null-terminator) as indicated by the required following ``ExactNumber`` rule.
+White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits.
+
+``string`` designates a null-terminated UTF-8 encoded character sequence with an octet length (including null-terminator) as indicated by the required following ``ExactNumber`` rule. The rationale for including both null termination and an exact length, usually indicated in the preceding rule, is to allow two modes of operation: when copying to a buffer, knowing the length of the buffer ahead of time avoids scanning the string twice, or resizing the buffer. When peeking at file contents directly, the null termination allows using standard string processing utilities.
 
 A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``.
 
@@ -84,7 +86,7 @@ A ``BitRange`` extracts the bits of the specified ``Rule`` by shifting the integ
 A ``BitCount`` is the number of set bits of the specified ``Rule``.
 
 # Formats
-Each format is made up of the following structure, where a valid file must begin and end with the ``File`` rule. The prefix to the ``Header`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
+Each format is made up of the following structure, where a valid file must begin and end with the ``File`` rule. The ``Identifier`` is structured to always take up 16 octets, and each file can only contain a single instance of a format and its payload.
 
 :: BNF
 File       ::= Identifier Header Payload
