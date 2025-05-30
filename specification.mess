@@ -41,7 +41,7 @@ Sequence     ::= Composition (' ' Composition)*
 Composition  ::= Composable Counter?
 Composable   ::= Rule
                | OctetArray
-               | Octet
+               | octet
                | Type
                | Switch
                | BitRange
