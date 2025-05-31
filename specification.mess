@@ -77,7 +77,7 @@ mask     --- A textual description of the number of bits to use.
 
 White space unless otherwise mandated may be inserted liberally to aid readability. Each rule ultimately defines a sequence of octets that should be parsed. The ``Type``s mentioned translate to signed integers, unsigned integers, and IEEE floating point numbers of the given number of bits.
 
-``string`` designates a null-terminated UTF-8 encoded character sequence with an octet length (including null-terminator) as indicated by the required following ``ExactNumber`` rule. The rationale for including both null termination and an exact length, usually indicated in the preceding rule, is to allow two modes of operation: when copying to a buffer, knowing the length of the buffer ahead of time avoids scanning the string twice, or resizing the buffer. When peeking at file contents directly, the null termination allows using standard string processing utilities.
+``string`` designates a null-terminated UTF-8 encoded character sequence with an octet length (including null-terminator) as indicated by the required following ``ExactNumber`` rule. As it includes the null terminator, the length must always be at least ``1``. The rationale for including both null termination and an exact length, usually indicated in the preceding rule, is to allow two modes of operation: when copying to a buffer, knowing the length of the buffer ahead of time avoids scanning the string twice, or resizing the buffer. When peeking at file contents directly, the null termination allows using standard string processing utilities.
 
 A ``Switch`` acts as a runtime switching based on the value of the referenced ``Rule``. This means that when evaluated, the ``Switch`` should act as if it were the ``Sequence`` of the ``SwitchCase`` whose ``octet`` sequence matches the value of the referenced ``Rule``. If the ``Rule`` evaluates to a value that does not match any of the ``SwitchCase``s, the file is invalid. For example, ``<x 00: int8 | 01: int16>`` with ``x`` evaluating to ``00`` would match an ``int8``, and when evaluating to ``01`` would match an ``int16``.
 
@@ -362,7 +362,7 @@ EntryOffset     ::= uint64
 
 The ``severity`` should be zero if the message is of neutral importance, positive for increasingly vital information, and negative for increasingly detailed information.
 
-Both the ``Source`` and ``Category`` may consist of just a null octet each if the information is not relevant.
+Both the ``Source`` and ``Category`` may consist of an empty string each if the information is not relevant.
 
 The format is designed such that an application can continuously append new entries. To do so, it should behave as follows:
 
