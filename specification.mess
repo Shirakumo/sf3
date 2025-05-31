@@ -486,8 +486,8 @@ This format is useful for storing uncompressed, directly accessible 3D geometry 
 This format is for storing a series of convex meshes that make up the collision shapes of a more complex model. It is far more efficient at storing this data than the generic model format and allows multiple shapes in one.
 
 :: BNF
-Header       ::= shape-count
-Payload      ::= mass Tensor Shape{shape-count}
+Header       ::= mass Tensor
+Payload      ::= shape-count Shape{shape-count}
 Tensor       ::= float32{9}
              --- The inertia tensor for the entire model, in row-major
                  order.
