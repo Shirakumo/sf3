@@ -165,6 +165,12 @@ Each ``EntryOffset`` in ``Metadata``, and each ``FileOffset`` in ``Files`` must 
 ### Use-Case
 This format is useful if you need a way to bundle files together into a single payload, and require constant-time, typed access to individual files without having to extract, decompress, or decrypt.
 
+### Related Files
+- ''single-text.ar.sf3''(link samples/archive/single-text.ar.sf3)
+  Archive with a single text file
+- ''multi-text.ar.sf3''(link samples/archive/multi-text.ar.sf3)
+  Archive with multiple text files
+
 ! raw latex \newpage
 ## Audio
 This format is for storing plain audio sample data. It includes support for most types of sample formats and channel numbers out there. The sample channels are interleaved, allowing the file to be written on the fly.
@@ -243,6 +249,14 @@ The payload must have exactly ``FrameCount*Channels*sample-size`` number of octe
 ### Use-Case
 This format is useful for raw audio data storage, which means it should be trivial to feed into an audio playback system with minimal overhead. Unlike the traditional uncompressed audio format, Wave, this follows a much clearer and simpler specification with sensible metadata encoding.
 
+### Related Files
+- ''f4-44100-1.sf3''(link samples/audio/f4-44100-1.sf3)
+  A single mono frame encoded as float4 at 44100Hz
+- ''f4-44100-2.sf3''(link samples/audio/f4-44100-2.sf3)
+  A single stereo frame encoded as float4 at 44100Hz
+- ''u8-44100-1.sf3''(link samples/audio/u8-44100-1.sf3)
+  A single mono frame encoded as uint8 at 44100Hz
+
 ! raw latex \newpage
 ## Image
 This format is for storing raw image data. Unlike plain data however, it includes a header that completely identifies the pixel data layout and format. The format supports 3D images as well.
@@ -318,6 +332,16 @@ The "origin" for an image like this should be assumed to be the "top left" corne
 ### Use-Case
 This format is useful for storing raw bitmap data that can be directly memory-mapped and read out. This is especially convenient for GPU texture uploads with DirectX, OpenGL, Vulkan, or similar.
 
+### Related Files
+- ''v-u8-1x1.img.sf3''(link samples/image/v-u8-1x1.img.sf3)
+  A black grayscale image of one pixel using uint8 storage
+- ''v-f4-1x1.img.sf3''(link samples/image/v-f4-1x1.img.sf3)
+  A black grayscale image of one pixel using float4 storage
+- ''v-f4-4x4.img.sf3''(link samples/image/v-f4-4x4.img.sf3)
+  A black grayscale image of sixteen pixels using float4 storage
+- ''rgb-u8-1x1.img.sf3''(link samples/image/rgb-u8-1x1.img.sf3)
+  A black RGB image of one pixel using uint8 storage
+
 ! raw latex \newpage
 ## Log
 This format is for storing generic logging and event information.
@@ -382,6 +406,20 @@ When ``EndTime`` is equivalent to the largest positive 64-bit integer, the file 
 
 ### Use-Case
 This format is useful for basic logging purposes in applications that run for a longer amount of time.The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
+
+### Related Files
+- ''empty.log.sf3''(link samples/log/empty.log.sf3)
+  An empty log file with no chunks
+- ''empty-chunk.log.sf3''(link samples/log/empty-chunk.log.sf3)
+  An empty log file with one chunk with no entries
+- ''one-message.log.sf3''(link samples/log/one-message.log.sf3)
+  A log file with one entry that only carries a message
+- ''filled-message.log.sf3''(link samples/log/filled-message.log.sf3)
+  A log file with one entry that carries all fields
+- ''partial-chunk.log.sf3''(link samples/log/partial-chunk.log.sf3)
+  A log file with a chunk that has unfilled entries
+- ''two-chunks.log.sf3''(link samples/log/two-chunks.log.sf3)
+  A log file with two filled chunks of one entry each
 
 ! raw latex \newpage
 ## Model
@@ -482,6 +520,16 @@ The coordinate system is intended to be right handed with Y+ up, Z- forward.
 ### Use-Case
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
 
+### Related Files
+- ''empty.mod.sf3''(link samples/model/empty.mod.sf3)
+  An empty model with no faces or vertices
+- ''triangle.mod.sf3''(link samples/model/triangle.mod.sf3)
+  A single triangle face
+- ''quad.mod.sf3''(link samples/model/quad.mod.sf3)
+  A square composed out of two triangles, using shared vertices
+- ''textured-quad.mod.sf3''(link samples/model/textured-quad.mod.sf3)
+  A textured square with UV coordinates and an albedo texture reference
+
 ! raw latex \newpage
 ## Physics-Model
 This format is for storing a series of convex meshes that make up the collision shapes of a more complex model. It is far more efficient at storing this data than the generic model format and allows multiple shapes in one.
@@ -540,6 +588,14 @@ The coordinate system is intended to be right handed with Y+ up, Z- forward.
 
 ### Use-Case
 This format is intended for use in games and other applications that require a convex decomposition of a model for use in collision testing. The packed storage format is ideal for direct use in-engine.
+
+### Related Files
+- ''box.phys.sf3''(link samples/physics-model/box.phys.sf3)
+  A single 1x1x1 box of 1kg
+- ''mesh.phys.sf3''(link samples/physics-model/mesh.phys.sf3)
+  A single tetrahedron mesh of 1kg
+- ''combine.phys.sf3''(link samples/physics-model/combine.phys.sf3)
+  A cylinder and a sphere shape, combined to form half a capsule
 
 ! raw latex \newpage
 ## Table
@@ -616,6 +672,18 @@ For ``String`` columns especially it should be noted that, due to the null termi
 ### Use-Case
 This format lends itself well to structured data that follows a precise schema, especially when new data only needs to be appended such as when recording datapoints. The header fields allow constant-time random access to the rows as well as windowing of the data.
 
+### Related Files
+- ''empty.tab.sf3''(link samples/table/empty.tab.sf3)
+  An empty single-column table
+- ''one-row.tab.sf3''(link samples/table/one-row.tab.sf3)
+  A table with a single string column and one row
+- ''two-rows.tab.sf3''(link samples/table/two-rows.tab.sf3)
+  A table with a single string column and two rows
+- ''two-columns.tab.sf3''(link samples/table/two-columns.tab.sf3)
+  A table with a string and an integer column and a single row
+- ''multiple-elements.tab.sf3''(link samples/table/multiple-elements.tab.sf3)
+  A table with a float column of three elements and a single row
+
 ! raw latex \newpage
 ## Text
 This format allows for a very simple rich text markup. The separation of the text from the markup makes it trivial to access its contents, avoiding complex parsing logic.
@@ -677,6 +745,12 @@ An implementation that is incapable of rendering some of the rich markup //may//
 
 ### Use-Case
 This format is useful for storing simple rich text documents that don't require complex layouting or processing.
+
+### Related Files
+- ''plain.txt.sf3''(link samples/text/plain.txt.sf3)
+  Plain text without any markup options
+- ''markup.txt.sf3''(link samples/text/markup.txt.sf3)
+  Text with some markup options applied
 
 ! raw latex \newpage
 ## Vector Graphic
@@ -771,6 +845,18 @@ If a visualiser or editor of a vector graphic file does not have access to the f
 
 ### Use-Case
 This format is useful for representing vector graphics in a light-weight way that should be easy to write a visualiser for. It intentionally does not specify much about text processing and instead leaves most of this up to the implementation.
+
+### Related Files
+- ''square.vec.sf3''(link samples/vector-graphic/squar.vec.sf3)
+  A single, black square that covers the entire canvas
+- ''circle.vec.sf3''(link samples/vector-graphic/circle.vec.sf3)
+  A single, black circle that stretches the entire canvas
+- ''diagonal.vec.sf3''(link samples/vector-graphic/diagonal.vec.sf3)
+  A diagonal line stretching across the entire canvas
+- ''text.vec.sf3''(link samples/vector-graphic/text.vec.sf3)
+  A single text line
+- ''blend.vec.sf3''(link samples/vector-graphic/blend.vec.sf3)
+  An example of overlapping shapes blending
 
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
