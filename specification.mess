@@ -334,7 +334,7 @@ EndTime         ::= int64
                     ends.
 Entry           ::= Size Time Severity Source Category Message
 Size            ::= uint32
-                --- The size of the remaining log entry in octets.
+                --- The size of the entire log entry in octets.
 Time            ::= uint64
                 --- The number of milliseconds since StartTime at which
                     this log entry was recorded.
@@ -357,7 +357,7 @@ EntryCount      ::= uint32
                 --- The number of entries in the chunk.
 EntryOffset     ::= uint64
                 --- The octet offset of the corresponding Entry from the
-                    beginning of Payload.
+                    beginning of this Chunk.
 ::
 
 The ``severity`` should be zero if the message is of neutral importance, positive for increasingly vital information, and negative for increasingly detailed information.
@@ -399,7 +399,8 @@ Texture        ::= texture-size string{texture-size}
 texture-size   ::= uint16
 Faces          ::= face-count uint32{face-count}
                --- An array of 0-based indices into the Vertices
-                   array, every 3 of which describe a face.
+                   array, every 3 of which describe a face. The count
+                   must be a multiple of 3.
 face-count     ::= uint32
 Vertices       ::= vertex-count float32{vertex-count}
                --- An array of vertices, packed as floats. The count
