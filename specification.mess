@@ -546,7 +546,7 @@ This format is intended for use in games and other applications that require a c
 This format specifies an arbitrary "table" similar to CSV files, albeit with a strict table schema encoded as part of the file.
 
 :: BNF
-Header        ::= spec-length column-count row-length row-count
+Header        ::= column-count row-length row-count spec-length
 Payload       ::= ColumnSpec{column-count} Row{row-count}
 spec-length   ::= uint32
               --- The length of the ColumnSpec block in octets.
