@@ -689,12 +689,13 @@ This format lends itself well to structured data that follows a precise schema, 
 This format allows for a very simple rich text markup. The separation of the text from the markup makes it trivial to access its contents, avoiding complex parsing logic.
 
 :: BNF
-Header         ::= markup-size
-Payload        ::= markup-count Markup{markup-count} text-length string{text-length}
+Header         ::= markup-size markup-count
+Payload        ::= Options text-length string{text-length}
+Options        ::= Markup{markup-count}
 markup-count   ::= uint32
 text-length    ::= uint64
 markup-size    ::= uint64
-               --- The size of the markup block in octets
+               --- The size of the Options block in octets
 Markup         ::= Start End Option
                --- A singular markup option
 Start          ::= uint64
