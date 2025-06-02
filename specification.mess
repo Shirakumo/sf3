@@ -786,7 +786,7 @@ Polygon       ::= ShapeOutline ShapeFill
               --- A many-edged convex polygon.
 Curve         ::= ShapeOutline ShapeFill
               --- A cubic Bezier curve directed by its control points.
-Text          ::= Point Color Font FontSize String
+Text          ::= Point Color FontSize Font String
               --- A single line of text.
 Font          ::= font-length string{font-length}
               --- The name of the font family to use to render the
