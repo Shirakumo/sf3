@@ -821,7 +821,7 @@ FontSize      ::= float32
 
 The coordinate system should be defined with X growing to the right, Y growing upwards, and the origin being in the lower left corner of the canvas. Whenever a ``Matrix`` is applied, the given matrix must be applied to all following ``Element``s until the next ``Matrix`` or ``Identity``. This transformation applies to the shape as a whole, including its size and orientation, not just the ``Point``s that define it in the file.
 
-When an element with a ``ShapeFill`` should be drawn, the fill must be drawn first, with the outline (if visible) second on top. If the shape is bounded by ``ShapeBounds``, the fill should meet the bounds, and the outline should be centred on the bounds when hitting them. If the shape is bounded by a ``ShapeOutline``, the outline must be drawn centred on the lines defined by the ``Edge``s.
+When an element with a ``ShapeFill`` should be drawn, the fill must be drawn first, with the outline (if visible) second on top. If the shape is bounded by ``ShapeBounds``, the fill should meet the bounds, and the outline should be centred on the bounds when hitting them. If the shape is bounded by a ``ShapeOutline``, the outline must be drawn centred on the lines defined by the ``Edge``s. The ``ShapeBounds`` define the lower left corner and the width and height of the shape's extent.
 
 When elements overlap, they should be drawn in the order that is specified in the file, with the colours being blended via the standard "source over" blending method.
 
