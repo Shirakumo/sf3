@@ -391,11 +391,11 @@ Both the ``Source`` and ``Category`` may consist of an empty string each if the 
 The format is designed such that an application can continuously append new entries. To do so, it should behave as follows:
 
 1. Increase the ``ChunkCount``
-2. Append a new ``Chunk`` and allocate a number of ``EntryOffset``s within the chunk.
+2. Append a new ``Chunk``, allocate a number of ``EntryOffset``s within the chunk, and set the first ``EntryOffset`` to point to the end of ``EntryOffsets``.
 3. When a new entry is generated and there are still unused ``EntryOffset``s:
    1. Update the ``ChunkSize`` and ``EntryCount``
-   2. Fill in the current end offset into the corresponding ``EntryOffset``.
    3. Append the new ``Entry``.
+   2. Fill in the next end offset into the corresponding ``EntryOffset`` if there is still space available.
 4. Otherwise start from 1.
 
 The ``EntryOffset``s allow a reading application to scan through the log much more quickly, and perform a binary search to identify date ranges.
