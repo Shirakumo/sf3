@@ -711,7 +711,8 @@ Option         ::= option-type <option-type 01: Bold
                                           | 07: Size
                                           | 08: Heading
                                           | 09: Link
-                                          | 0A: Target>
+                                          | 0A: Target
+                                          | 0B: Font>
 option-type    ::= uint8
                --- A description of the text style.
 Bold           --- The font weight should be set to "bold"
@@ -736,6 +737,10 @@ Level          ::= uint8
 Address        ::= address-length string{address-length}
                --- Some kind of target identifier. Often a URL string.
 address-length ::= uint16
+Font           ::= font-length string{font-length}
+               --- The text should be rendered with a font of the described
+                   font-family.
+font-length    ::= uint16
 ::
 
 The font family, default font size, background colour, foreground colour, and line wrapping mode are all determined by the visualiser. The visualiser may also apply default alternate styling to sections marked up with the ``Link`` option. If the ``Address`` of a ``Link`` is the same as that of a ``Target`` option, the ``Link`` markup should, when interacted with, point the user to the text marked up by the corresponding ``Target`` option. Otherwise the behaviour of interaction with the ``Link`` text is up to the implementation.
@@ -743,6 +748,8 @@ The font family, default font size, background colour, foreground colour, and li
 The ``Markup`` options may be in any particular order with regards to their ``Start`` and ``End``, and the bounds may also overlap arbitrarily.
 
 An implementation that is incapable of rendering some of the rich markup //may// modify the displayed text to preserve some of the markup in a visible, albeit textual manner. Particularly, if an implementation is incapable of presenting user-interactive links, the ``Link`` option should be rendered by showing the ``Address`` after the ``End`` of the ``Markup``.
+
+If a visualiser or editor of a text file does not have access to the font specified in a ``Font`` field, it //should// generate an error, but //may// exchange the font for a similar one. In either case, it //must// inform the user of the missing font.
 
 ### Use-Case
 This format is useful for storing simple rich text documents that don't require complex layouting or processing.
