@@ -612,7 +612,7 @@ row-length    ::= uint64
               --- The length of every row in octets.
 row-count     ::= uint64
               --- The number of rows in the file.
-ColumnSpec    ::= name-length string{name-length} column-length Column
+ColumnSpec    ::= column-length Column name-length string{name-length}
 name-length   ::= uint16
               --- The length of the column name in octets.
 column-length ::= uint32
