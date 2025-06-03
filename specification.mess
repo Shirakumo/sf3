@@ -776,15 +776,15 @@ Instruction   ::= instruction-type
                                   | 11: Identity
                                   | 12: Matrix>
 instruction-type  ::= uint8
-Line          ::= ShapeOutline Color Thickness
+Line          ::= Color Thickness ShapeOutline
               --- A sequence of connected line segments.
-Rectangle     ::= ShapeBounds ShapeFill
+Rectangle     ::= ShapeFill ShapeBounds
               --- An axis-aligned rectangle.
-Circle        ::= ShapeBounds ShapeFill
+Circle        ::= ShapeFill ShapeBounds
               --- An axis-aligned oval circle.
-Polygon       ::= ShapeOutline ShapeFill
+Polygon       ::= ShapeFill ShapeOutline
               --- A many-edged convex polygon.
-Curve         ::= ShapeOutline ShapeFill
+Curve         ::= ShapeFill ShapeOutline
               --- A cubic Bezier curve directed by its control points.
 Text          ::= Point Color FontSize Font String
               --- A single line of text.
