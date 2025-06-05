@@ -1,0 +1,116 @@
+# SF3 [Simple File Format Family] files
+# (Yukari Hafner, shinmera@tymoon.eu)
+# 
+# Reference: https://shirakumo.org/docs/sf3
+
+0	name		SF3-archive
+>0	lequad		x		\b, %d files
+!:mime	application/x.sf3-archive
+!:ext   ar.sf3/sf3
+
+0	name		SF3-audio
+>0	lelong		>1		\b, %dHz
+>4	byte		>0		\b, %d channels
+>5	byte		0x01	\b, A-law
+>5	byte		0x02	\b, 16-bit signed PCM
+>5	byte		0x04	\b, 32-bit signed PCM
+>5	byte		0x08	\b, 64-bit signed PCM
+>5	byte		0x11	\b, u-law
+>5	byte		0x12	\b, 16-bit unsigned PCM
+>5	byte		0x14	\b, 32-bit unsigned PCM
+>5	byte		0x18	\b, 64-bit unsigned PCM
+>5	byte		0x22	\b, half-float PCM
+>5	byte		0x24	\b, single-float PCM
+>5	byte		0x28	\b, double-float PCM
+!:mime	audio/x.sf3
+!:ext   au.sf3/sf3
+
+0	name		SF3-image
+>0	lelong		>0		\b, %d
+>4	lelong		>0		\bx%d
+>8	lelong		>0		\bx%d
+>12	byte		0x01	\b, grayscale
+>12	byte		0x02	\b, grayscale-alpha
+>12	byte		0x03	\b, RGB
+>12	byte		0x04	\b, RGBA
+>12	byte		0x12	\b, grayscale-alpha
+>12	byte		0x13	\b, BGR
+>12	byte		0x14	\b, ABGR
+>12	byte		0x24	\b, ARGB
+>12	byte		0x34	\b, BGRA
+>12	byte		0x44	\b, CMYK
+>12	byte		0x54	\b, KYMC
+>13	byte		0x01	\b, 8-bit signed
+>13	byte		0x02	\b, 16-bit signed
+>13	byte		0x04	\b, 32-bit signed
+>13	byte		0x08	\b, 64-bit signed
+>13	byte		0x11	\b, 8-bit unsigned
+>13	byte		0x12	\b, 16-bit unsigned
+>13	byte		0x14	\b, 32-bit unsigned
+>13	byte		0x18	\b, 64-bit unsigned
+>13	byte		0x22	\b, half-float
+>13	byte		0x24	\b, single-float
+>13	byte		0x28	\b, double-float
+!:mime	image/x.sf3
+!:ext   img.sf3/sf3
+
+0	name		SF3-log
+>0	leqdate		x		\b, from %s
+>8	leqdate		x		\b, to %s
+>16	leshort		x		\b, %d chunks
+!:mime	application/x.sf3-log
+!:ext   log.sf3/sf3
+
+0	name		SF3-model
+!:mime	model/x.sf3
+!:ext   mod.sf3/sf3
+
+0	name		SF3-physics-model
+>0	lefloat		x	\b, %f kg
+>40	leshort		x	\b, %d shapes
+!:mime	model/x.sf3-physics
+!:ext   phys.sf3/sf3
+
+0	name		SF3-table
+>0	leshort		x	\b, %d columns
+>10	lequad		x	\b, %d rows
+!:mime	application/x.sf3-table
+!:ext   tab.sf3/sf3
+
+0	name		SF3-text
+>8	lelong		x	\b, %d markup options
+!:mime	application/x.sf3-text
+!:ext   txt.sf3/sf3
+
+0	name		SF3-vector-graphic
+>0	lelong		>0	\b, %d
+>4	lelong		>0	\bx%d
+>8	lelong		x	\b, %d instructions
+!:mime	image/x.sf3-vector
+!:ext   vec.sf3/sf3
+
+# Generic SF3 Header
+0	string		\x81SF3\x00\xE0\xD0\x0D\x0A\x0A	SF3 raw data
+11	lelong		x
+15	byte		0x00
+>10	byte		0x01
+>>16	use			SF3-archive
+>10	byte		0x02
+>>16	use			SF3-audio
+>10	byte		0x03
+>>16	use			SF3-image
+>10	byte		0x04
+>>16	use			SF3-log
+>10	byte		0x05
+>>16	use			SF3-model
+>10	byte		0x06
+>>16	use			SF3-physics-model
+>10	byte		0x07
+>>16	use			SF3-table
+>10	byte		0x08
+>>16	use			SF3-text
+>10	byte		0x09
+>>16	use			SF3-vector-graphic
+>10	byte		>9	Unknown type (%d)
+!:mime	application/x.sf3
+!:ext   sf3
