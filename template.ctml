@@ -9,21 +9,17 @@
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="SF3 Specification">
-    <meta name="twitter:description" content="SF3 - The Simple File Format Family is a specification of a number of simple binary file formats.">
+    <meta name="twitter:description" content="SF3 - The Simple File Format Family is an open and free specification of a number of simple binary file formats.">
     <meta name="twitter:image" content="https://shirakumo.org/card.png">
     <meta name="twitter:image:alt" content="">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="SF3 Specification">
-    <meta property="og:description" content="SF3 - The Simple File Format Family is a specification of a number of simple binary file formats.">
+    <meta property="og:description" content="SF3 - The Simple File Format Family is an open and free specification of a number of simple binary file formats.">
     <meta property="og:url" content="https://shirakumo.org/docs/sf3">
     <meta property="og:image" content="https://shirakumo.org/docs/sf3/card.png">
   </head>
   <body>
-    <div class="alert">
-      <header>This is a Draft Specification</header>
-      This document is not finalised. Do not use its contents as a reference as they may change in the future as the specification process advances.
-    </div>
     <main>
   </body>
 </html>
