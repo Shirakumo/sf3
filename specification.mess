@@ -13,8 +13,8 @@ SF3 formats follow these principles:
   There are no optional blocks or parts in the formats that could be omitted. This means there is no conditional parsing needed and the structure of the files is always clear.
 - **Only raw data**
   The data is not compressed, encrypted, or otherwise transformed. Data is always raw. If encryption or compression is desired, the entire file can instead be wrapped in a compression or encryption stream (gzip, lzma, etc).
-- **Always little-endian**
-  The formats are always little-endian wherever byte order matters. This is compatible with the vast majority of processors and software today and means no byte rearrangement is necessary when loading to memory.
+- **Target recent machines**
+  The formats are always little-endian wherever byte order matters, and use 8-bit addressing boundaries. This is compatible with the vast majority of processors and software today and means no byte rearrangement is necessary when loading to memory.
 - **Similar layout**
   Each format in the family follows a very similar format of identifier, header, and payload. This ensures that the files remain easy to parse, understand, and debug.
 
@@ -671,7 +671,7 @@ Usually the ``column-length`` will fit exactly one element, meaning it will be t
 
 The ``Row`` is specified as an opaque blob in the BNF, but can be easily decoded according to the layout specified by the ``ColumnSpec``s. The data for each column must follow in the same order as the ``ColumnSpec``s inside the row, without any gaps between. A decoder can thus simply iterate over the ``ColumnSpec``s and decode each "cell" by first determining the number of elements, and then decoding each element in the cell according to the ``column-type``.
 
-For ``String`` columns especially it should be noted that, due to the null termination, the string may be //shorter// than the number of bytes reserved by the ``column-length``. Unlike other column types, too, a ``String`` column can only ever contain one element.
+For ``String`` columns especially it should be noted that, due to the null termination, the string may be //shorter// than the number of octets reserved by the ``column-length``. Unlike other column types, too, a ``String`` column can only ever contain one element.
 
 ### Use-Case
 This format lends itself well to structured data that follows a precise schema, especially when new data only needs to be appended such as when recording datapoints. The header fields allow constant-time random access to the rows as well as windowing of the data.

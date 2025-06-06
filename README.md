@@ -18,5 +18,5 @@ SF3 is a Simple File Format Family. Please see the [specification homepage](http
   Implementation of the SF3 file formats in Kaitai struct, from which libraries in many languages can also be generated.
 - [libsf3](https://shirakumo.org/docs/libsf3)  
   Implementation of the SF3 file formats in C99 as a header-only library.
-- [cl-sf3](https;//shirakumo.org/docs/cl-sf3)  
+- [cl-sf3](https://shirakumo.org/docs/cl-sf3)  
   Implementation of the SF3 file formats in Common Lisp.
