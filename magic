@@ -4,13 +4,12 @@
 # Reference: https://shirakumo.org/docs/sf3
 
 0	name		SF3-archive
->0	lequad		x		\b, %d files
+>0	ulequad		x		\b, %llu files
 !:mime	application/x.sf3-archive
-!:ext   ar.sf3/sf3
 
 0	name		SF3-audio
->0	lelong		>1		\b, %dHz
->4	byte		>0		\b, %d channels
+>0	ulelong		>1		\b, %dHz
+>4	ubyte		>0		\b, %d channels
 >5	byte		0x01	\b, A-law
 >5	byte		0x02	\b, 16-bit signed PCM
 >5	byte		0x04	\b, 32-bit signed PCM
@@ -23,12 +22,11 @@
 >5	byte		0x24	\b, single-float PCM
 >5	byte		0x28	\b, double-float PCM
 !:mime	audio/x.sf3
-!:ext   au.sf3/sf3
 
 0	name		SF3-image
->0	lelong		>0		\b, %d
->4	lelong		>0		\bx%d
->8	lelong		>0		\bx%d
+>0	ulelong		>0		\b, %d
+>4	ulelong		>0		\bx%d
+>8	ulelong		>0		\bx%d
 >12	byte		0x01	\b, grayscale
 >12	byte		0x02	\b, grayscale-alpha
 >12	byte		0x03	\b, RGB
@@ -52,65 +50,59 @@
 >13	byte		0x24	\b, single-float
 >13	byte		0x28	\b, double-float
 !:mime	image/x.sf3
-!:ext   img.sf3/sf3
 
 0	name		SF3-log
 >0	leqdate		x		\b, from %s
 >8	leqdate		x		\b, to %s
->16	leshort		x		\b, %d chunks
+>16	uleshort	x		\b, %d chunks
 !:mime	application/x.sf3-log
-!:ext   log.sf3/sf3
 
 0	name		SF3-model
+>(2.l+22)	ulelong	x	\b, %d face indices
+# How the heck.
+#>>&(&-8.l*4)	ulelong	x	\b, %d vertices
 !:mime	model/x.sf3
-!:ext   mod.sf3/sf3
 
 0	name		SF3-physics-model
 >0	lefloat		x	\b, %f kg
->40	leshort		x	\b, %d shapes
+>40	uleshort	x	\b, %d shapes
 !:mime	model/x.sf3-physics
-!:ext   phys.sf3/sf3
 
 0	name		SF3-table
->0	leshort		x	\b, %d columns
->10	lequad		x	\b, %d rows
+>0	uleshort	x	\b, %d columns
+>10	ulequad		x	\b, %llu rows
 !:mime	application/x.sf3-table
-!:ext   tab.sf3/sf3
 
 0	name		SF3-text
->8	lelong		x	\b, %d markup options
+>8	ulelong		x	\b, %d markup options
 !:mime	application/x.sf3-text
-!:ext   txt.sf3/sf3
 
 0	name		SF3-vector-graphic
->0	lelong		>0	\b, %d
->4	lelong		>0	\bx%d
->8	lelong		x	\b, %d instructions
+>0	ulelong		>0	\b, %d
+>4	ulelong		>0	\bx%d
+>8	ulelong		x	\b, %d instructions
 !:mime	image/x.sf3-vector
-!:ext   vec.sf3/sf3
 
 # Generic SF3 Header
-0	string		\x81SF3\x00\xE0\xD0\x0D\x0A\x0A	SF3 raw data
-11	lelong		x
-15	byte		0x00
->10	byte		0x01
+0	string		\x81SF3\x00\xE0\xD0\x0D\x0A\x0A	SF3
+>10	byte		0x01	archive
 >>16	use			SF3-archive
->10	byte		0x02
+>10	byte		0x02	audio file
 >>16	use			SF3-audio
->10	byte		0x03
+>10	byte		0x03	image file
 >>16	use			SF3-image
->10	byte		0x04
+>10	byte		0x04	log file
 >>16	use			SF3-log
->10	byte		0x05
+>10	byte		0x05	3D model
 >>16	use			SF3-model
->10	byte		0x06
+>10	byte		0x06	physics model
 >>16	use			SF3-physics-model
->10	byte		0x07
+>10	byte		0x07	table
 >>16	use			SF3-table
->10	byte		0x08
+>10	byte		0x08	text file
 >>16	use			SF3-text
->10	byte		0x09
+>10	byte		0x09	vector graphic
 >>16	use			SF3-vector-graphic
->10	byte		>9	Unknown type (%d)
+>10	byte		>9		file of unknown type (%d)
 !:mime	application/x.sf3
 !:ext   sf3
