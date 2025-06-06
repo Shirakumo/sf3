@@ -529,6 +529,8 @@ This format is useful for storing uncompressed, directly accessible 3D geometry 
   A square composed out of two triangles, using shared vertices
 - ''textured-quad.mod.sf3''(link samples/model/textured-quad.mod.sf3)
   A textured square with UV coordinates and an albedo texture reference
+- ''pbr-quad.mod.sf3''(link samples/model/pbr-quad.mod.sf3)
+  A textured square with UV coordinates and a full PBR texture reference
 
 ! raw latex \newpage
 ## Physics-Model
@@ -596,6 +598,8 @@ This format is intended for use in games and other applications that require a c
   A single tetrahedron mesh of 1kg
 - ''combine.phys.sf3''(link samples/physics-model/combine.phys.sf3)
   A cylinder and a sphere shape, combined to form half a capsule
+- ''all-shapes.phys.sf3''(link samples/physics-model/all-shapes.phys.sf3)
+  A file that includes an instance of every shape type
 
 ! raw latex \newpage
 ## Table
@@ -683,6 +687,8 @@ This format lends itself well to structured data that follows a precise schema, 
   A table with a string and an integer column and a single row
 - ''multiple-elements.tab.sf3''(link samples/table/multiple-elements.tab.sf3)
   A table with a float column of three elements and a single row
+- ''all-types.tab.sf3''(link samples/table/all-types.tab.sf3)
+  A table with a column of every type and a single row
 
 ! raw latex \newpage
 ## Text
@@ -759,6 +765,8 @@ This format is useful for storing simple rich text documents that don't require 
   Plain text without any markup options
 - ''markup.txt.sf3''(link samples/text/markup.txt.sf3)
   Text with some markup options applied
+- ''all-options.txt.sf3''(link samples/text/all-options.txt.sf3)
+  Text with an instance of every option type applied
 
 ! raw latex \newpage
 ## Vector Graphic
@@ -865,6 +873,8 @@ This format is useful for representing vector graphics in a light-weight way tha
   A single text line
 - ''blend.vec.sf3''(link samples/vector-graphic/blend.vec.sf3)
   An example of overlapping shapes blending
+- ''all-instructions.vec.sf3''(link samples/vector-graphic/all-instructions.vec.sf3)
+  A file with an instance of every instruction type
 
 # Metadata
 These formats can be delivered as part of a binary stream or deposited in a file system. The following are recommendation for metadata identifiers to distinguish SF3 data without having to parse it.
