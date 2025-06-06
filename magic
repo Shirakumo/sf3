@@ -58,9 +58,8 @@
 !:mime	application/x.sf3-log
 
 0	name		SF3-model
->(2.l+22)	ulelong	x	\b, %d face indices
-# How the heck.
-#>>&(&-8.l*4)	ulelong	x	\b, %d vertices
+>(2.l+22)		ulelong	x	\b, %d face indices
+>>&(&-20.l*4)	ulelong	x	\b, %d vertex attributes
 !:mime	model/x.sf3
 
 0	name		SF3-physics-model
