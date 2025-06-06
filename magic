@@ -75,6 +75,7 @@
 
 0	name		SF3-text
 >8	ulelong		x	\b, %d markup options
+>(0.q+28)	ulequad	x	\b, %llu bytes of text
 !:mime	application/x.sf3-text
 
 0	name		SF3-vector-graphic
