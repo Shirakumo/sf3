@@ -405,7 +405,7 @@ The ``Time`` in each successive ``Entry`` //should// monotonically increase, tho
 When ``EndTime`` is equivalent to the largest positive 64-bit integer, the file is considered to still be "open" and new entries may yet be appended to it.
 
 ### Use-Case
-This format is useful for basic logging purposes in applications that run for a longer amount of time.The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
+This format is useful for basic logging purposes in applications that run for a longer amount of time. The binary format allows quickly skipping ahead in the file to reach interesting messages or to filter out important events.
 
 ### Related Files
 - ''empty.log.sf3''(link samples/log/empty.log.sf3)
