@@ -20,3 +20,5 @@ SF3 is a Simple File Format Family. Please see the [specification homepage](http
   Implementation of the SF3 file formats in C99 as a header-only library.
 - [cl-sf3](https://shirakumo.org/docs/cl-sf3)  
   Implementation of the SF3 file formats in Common Lisp.
+- [sf3-blender-addon](https://shirakumo.org/projects/sf3-blender-addon)  
+  An addon for Blender to export and import SF3 model files.
