@@ -517,6 +517,8 @@ The included ``MaterialSize`` field should allow constant-time access to the ver
 
 The coordinate system is intended to be right handed with Y+ up, Z- forward.
 
+An instance of the SF3 model file can only store a single object of a single material. Frequently models are composed of different materials and objects packed together. In such a case, it is advised to export the individual material instances as separate files, and to bundle them together in another container such as an SF3 Archive. That way the material textures can also be delivered alongside the model data.
+
 ### Use-Case
 This format is useful for storing uncompressed, directly accessible 3D geometry data. It is packed in such a way that it should be trivial to upload into vertex-buffers for use with GPU rendering toolkits like DirectX, OpenGL, Vulkan, or similar. For instance, the ``format`` describes the vertex-array layout, the ``Faces`` array makes up the element-buffer, and the ``Vertices`` makes up the vertex-buffer.
 
