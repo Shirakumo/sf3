@@ -533,6 +533,8 @@ This format is useful for storing uncompressed, directly accessible 3D geometry 
   A textured square with UV coordinates and an albedo texture reference
 - ''pbr-quad.mod.sf3''(link samples/model/pbr-quad.mod.sf3)
   A textured square with UV coordinates and a full PBR texture reference
+- ''multiple.ar.sf3''(link samples/model/multiple.ar.sf3)
+  Two squares stored as separate models within an archive
 
 ! raw latex \newpage
 ## Physics-Model
