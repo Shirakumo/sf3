@@ -91,7 +91,7 @@ Each format is made up of the following structure, where a valid file must begin
 :: BNF
 File       ::= Identifier Header Payload
 Identifier ::= [ 81 53 46 33 00 E0 D0 0D 0A 0A ] format-id checksum [ 00 ]
-checksum   ::= uint32 --- A CRC32 checksum of the Payload.
+checksum   ::= uint32 --- A CRC32 checksum of everything following the Identifier.
 format-id  ::= uint8 --- A single octet identifying the format.
 ::
 
