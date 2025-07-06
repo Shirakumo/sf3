@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="application/x.sf3-archive">
+    <comment>SF3 Archive</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.ar.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x01" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="audio/x.sf3">
+    <comment>SF3 Audio</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.au.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x02" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="image/x.sf3">
+    <comment>SF3 Image</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.img.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x03" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="application/x.sf3-log">
+    <comment>SF3 Log File</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.log.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x04" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="model/x.sf3">
+    <comment>SF3 3D Model</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.mod.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x05" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="model/x.sf3-physics">
+    <comment>SF3 Physics Model</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.phys.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x06" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="application/x.sf3-table">
+    <comment>SF3 Table</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.tab.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x07" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="application/x.sf3-text">
+    <comment>SF3 Rich Text</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.txt.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x08" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="image/x.sf3-vector">
+    <comment>SF3 Vector Graphic</comment>
+    <acronym>SF3</acronym>
+    <expanded-acronym>Simple File Format Family</expanded-acronym>
+    <glob pattern="*.vec.sf3"/>
+    <glob pattern="*.sf3"/>
+    <magic>
+      <match type="string" value="\x81SF3\x00\xE0\xD0\x0D\x0A\x0A\x09" offset="0"/>
+    </magic>
+  </mime-type>
+</mime-info>

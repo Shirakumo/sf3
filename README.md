@@ -10,6 +10,8 @@ SF3 is a Simple File Format Family. Please see the [specification homepage](http
   Sample files to test SF3 implementations against.
 - `magic`  
   libmagic/UNIX-file magic parser for SF3 files.
+- `mime.xml`  
+  XDG shared-mime-info patterns for SF3 files.
 - `card.png`, `index.html`, `template.ctml`, `style.css`, `style.lass`, `style.tex`  
   Used for generating website and the HTML and PDF versions of the specification.
 
