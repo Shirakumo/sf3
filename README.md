@@ -1,26 +1,4 @@
-# About SF3
-SF3 is a Simple File Format Family. Please see the [specification homepage](https://shirakumo.github.io/sf3).
+# This repository has [moved](https://shirakumo.org/projects/sf3)!
+Due to Microsoft's continued enshittification of the platform this repository has been moved to [Codeberg](https://shirakumo.org/projects/sf3) in August of 2025. It will not receive further updates or patches. **Issues and pull requests will not be looked at here either**, please submit your patches and issue tickets on Codeberg, or send them directly via good old email patches to [shirakumo@tymoon.eu](mailto:shirakumo@tymoon.eu).
 
-## Files in this repository
-- `LICENSE`  
-  The license of the specification and related files (zlib)
-- `specification.mess`  
-  Original source text for the specification in [Markless](https://shirakumo.org/docs/markless) format.
-- `samples/`  
-  Sample files to test SF3 implementations against.
-- `magic`  
-  libmagic/UNIX-file magic parser for SF3 files.
-- `mime.xml`  
-  XDG shared-mime-info patterns for SF3 files.
-- `card.png`, `index.html`, `template.ctml`, `style.css`, `style.lass`, `style.tex`  
-  Used for generating website and the HTML and PDF versions of the specification.
-
-## Related projects
-- [sf3.ksy](https://shirakumo.org/projects/sf3.ksy)  
-  Implementation of the SF3 file formats in Kaitai struct, from which libraries in many languages can also be generated.
-- [libsf3](https://shirakumo.org/docs/libsf3)  
-  Implementation of the SF3 file formats in C99 as a header-only library.
-- [cl-sf3](https://shirakumo.org/docs/cl-sf3)  
-  Implementation of the SF3 file formats in Common Lisp.
-- [sf3-blender-addon](https://shirakumo.org/projects/sf3-blender-addon)  
-  An addon for Blender to export and import SF3 model files.
+Thanks.
